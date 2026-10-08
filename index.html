@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JASMIN // STEAM OPERATIVE PROFILE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+SC:wght@400;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Tone.js for Web Audio Synthesis -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff0055;
+            --neon-purple: #7000ff;
+            --neon-yellow: #fffe00;
+            --dark-bg: #050508;
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Noto Sans SC', sans-serif;
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+        }
+
+        .font-mono-code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Scanline Overlay Effect */
+        .scanlines {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.3) 50%,
+                rgba(0, 0, 0, 0.3)
+            );
+            background-size: 100% 4px;
+        }
+
+        /* Cyberpunk Glitch Effect */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-text {
+            position: relative;
+            text-shadow: 0 0 10px rgba(0,240,255,0.7), 0 0 20px rgba(0,240,255,0.5);
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip: rect(0, 0, 0, 0);
+        }
+
+        .glitch-text::before {
+            left: -2px;
+            text-shadow: 2px 0 var(--neon-pink);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: 2px;
+            text-shadow: -2px 0 var(--neon-cyan);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(20px, 9999px, 15px, 0); }
+            20% { clip: rect(42px, 9999px, 80px, 0); }
+            40% { clip: rect(10px, 9999px, 5px, 0); }
+            60% { clip: rect(65px, 9999px, 30px, 0); }
+            80% { clip: rect(30px, 9999px, 70px, 0); }
+            100% { clip: rect(85px, 9999px, 10px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(25px, 9999px, 90px, 0); }
+            20% { clip: rect(10px, 9999px, 40px, 0); }
+            40% { clip: rect(50px, 9999px, 15px, 0); }
+            60% { clip: rect(5px, 9999px, 85px, 0); }
+            80% { clip: rect(70px, 9999px, 25px, 0); }
+            100% { clip: rect(35px, 9999px, 60px, 0); }
+        }
+
+        /* Cyber Glassmorphism */
+        .cyber-card {
+            background: rgba(10, 12, 22, 0.75);
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
+        }
+
+        /* Custom Clip Paths for Cyberpunk Corners */
+        .cyber-cut {
+            clip-path: polygon(
+                0 0, 
+                calc(100% - 15px) 0, 
+                100% 15px, 
+                100% 100%, 
+                15px 100%, 
+                0 calc(100% - 15px)
+            );
+        }
+
+        .cyber-btn {
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: all 0.2s ease;
+        }
+
+        /* Animated Progress Bar Glow */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 5px var(--neon-cyan)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 12px var(--neon-cyan)); }
+        }
+
+        .glow-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .profile-avatar {
+            box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.65),
+                        0 0 28px rgba(0, 240, 255, 0.28);
+        }
+
+        .status-dot {
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        .game-card {
+            min-height: 184px;
+            background-position: center;
+            background-size: cover;
+            isolation: isolate;
+        }
+
+        .game-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(100deg, rgba(3, 5, 12, 0.98) 5%, rgba(3, 5, 12, 0.8) 52%, rgba(3, 5, 12, 0.35));
+        }
+
+        .sync-spinner {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast-visible {
+            opacity: 1 !important;
+            transform: translate(-50%, 0) !important;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--neon-yellow);
+            outline-offset: 4px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050508;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f0ff;
+            border-radius: 3px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+            .cyber-card:hover { transform: none; }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-100 flex flex-col justify-between">
+
+    <!-- Particle Background Canvas -->
+    <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Scanline Visual Layer -->
+    <div class="fixed inset-0 scanlines pointer-events-none z-10 opacity-40"></div>
+
+    <!-- Ambient Gradient Blur Orbs -->
+    <div class="fixed top-1/4 left-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="fixed bottom-1/4 right-10 w-96 h-96 bg-fuchsia-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="relative z-20 w-full px-6 py-4 flex justify-between items-center border-b border-cyan-500/20 bg-black/40 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg border border-cyan-400/50 bg-cyan-950/40 flex items-center justify-center text-cyan-400 font-bold text-xl shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+                <i class="fa-solid font-orbitron">J</i>
+            </div>
+            <div>
+                <h1 class="font-orbitron text-lg tracking-widest text-white font-black leading-none flex items-center gap-2">
+                    JASMIN <span class="text-xs px-2 py-0.5 rounded bg-pink-500/20 text-pink-400 border border-pink-500/40">GM-99</span>
+                </h1>
+                <p id="system-status" class="text-[10px] text-cyan-400/80 font-mono tracking-wider">STEAM UPLINK: INITIALIZING...</p>
+            </div>
+        </div>
+
+        <!-- Audio & Sync Controls -->
+        <div class="flex items-center gap-3 md:gap-4">
+            <button id="sfx-btn" onclick="toggleAudio()" class="cyber-btn bg-slate-900 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 hover:text-white px-3 py-1.5 md:px-4 md:py-2 text-xs font-mono flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-volume-xmark" id="sfx-icon"></i>
+                <span id="sfx-text" class="hidden sm:inline">AUDIO: OFF</span>
+            </button>
+            <button id="refresh-btn" onclick="refreshSteamProfile(true)" class="cyber-btn bg-pink-950/50 border border-pink-500/50 hover:border-pink-400 text-pink-400 hover:text-white px-3 py-1.5 md:px-4 md:py-2 text-xs font-mono flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(255,0,85,0.2)]">
+                <i id="refresh-icon" class="fa-solid fa-rotate"></i>
+                <span class="hidden sm:inline">SYNC STEAM</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="relative z-20 max-w-7xl mx-auto px-4 py-8 md:py-12 flex-grow flex flex-col justify-center">
+        <!-- Hero Header -->
+        <div class="text-center my-6 md:my-10">
+            <!-- Subtitle badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/40 bg-pink-950/30 text-pink-400 text-xs md:text-sm font-mono tracking-widest uppercase mb-6 shadow-[0_0_15px_rgba(255,0,85,0.2)]">
+                <i class="fa-solid fa-gamepad text-pink-400 animate-bounce"></i>
+                <span>Steam Operative // Public Profile</span>
+            </div>
+
+            <!-- Main Glitch Greeting Text -->
+            <h1 class="font-orbitron text-3xl sm:text-5xl md:text-7xl font-black tracking-tight text-white mb-4">
+                <span class="glitch-wrapper">
+                    <span class="glitch-text" data-text="HELLO, THIS IS JASMIN">HELLO, THIS IS JASMIN</span>
+                </span>
+            </h1>
+            <p class="text-cyan-400/90 font-mono text-sm md:text-xl tracking-widest max-w-2xl mx-auto uppercase">
+                &lt; 欢迎进入我的赛博游戏档案 // READY PLAYER ONE &gt;
+            </p>
+        </div>
+
+        <!-- Steam identity and active mission -->
+        <section class="cyber-card cyber-cut border border-cyan-500/40 p-5 md:p-7 my-6 relative overflow-hidden shadow-[0_0_28px_rgba(0,240,255,0.12)]">
+            <div class="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-cyan-500/10 to-transparent pointer-events-none"></div>
+            <div class="relative grid lg:grid-cols-[1.1fr_0.9fr] gap-7 items-center">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+                    <div class="relative shrink-0">
+                        <img id="profile-avatar" class="profile-avatar w-28 h-28 md:w-36 md:h-36 object-cover cyber-cut bg-slate-900" alt="Jasmin 的 Steam 头像" referrerpolicy="no-referrer">
+                        <span id="profile-status-dot" class="status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-500 border-4 border-slate-950 text-slate-500"></span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap justify-center sm:justify-start items-center gap-2 mb-2">
+                            <span id="profile-source" class="px-2 py-1 border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-[10px] font-mono tracking-widest">PUBLIC SNAPSHOT</span>
+                            <span id="profile-status" class="px-2 py-1 border border-slate-600/50 bg-slate-900 text-slate-300 text-[10px] font-mono tracking-widest">OFFLINE</span>
+                        </div>
+                        <h2 id="profile-name" class="font-orbitron text-3xl md:text-5xl font-black text-white tracking-tight">Jasmin</h2>
+                        <p class="font-mono text-xs text-slate-500 mt-1">STEAM_ID64 // 76561199836731858</p>
+                        <p class="text-slate-300 mt-4 max-w-xl leading-relaxed">精确跳跃、谜题推理、文明规划与战术对局——这里记录我的公开 Steam 作战轨迹。</p>
+                        <div class="flex flex-wrap justify-center sm:justify-start gap-3 mt-5">
+                            <a id="steam-profile-link" href="https://steamcommunity.com/profiles/76561199836731858/" target="_blank" rel="noopener noreferrer" class="cyber-btn inline-flex items-center gap-2 bg-cyan-500 text-slate-950 font-bold px-5 py-2.5 text-sm hover:bg-white transition-colors">
+                                <i class="fa-brands fa-steam"></i> OPEN STEAM PROFILE
+                            </a>
+                            <a href="#recent-games" class="cyber-btn inline-flex items-center gap-2 border border-pink-500/60 text-pink-300 bg-pink-950/30 px-5 py-2.5 text-sm hover:text-white hover:border-pink-300 transition-colors">
+                                <i class="fa-solid fa-bolt"></i> RECENT MISSIONS
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-black/55 border border-pink-500/30 p-5 cyber-cut">
+                    <div class="flex items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+                        <span class="font-orbitron text-sm text-pink-300 tracking-widest">ACTIVE MISSION</span>
+                        <span class="text-[10px] font-mono text-slate-500">REAL-TIME SLOT</span>
+                    </div>
+                    <p id="current-game-name" class="font-orbitron text-xl md:text-2xl font-bold text-white">NO ACTIVE GAME</p>
+                    <p id="current-game-detail" class="text-sm text-slate-400 mt-2">Jasmin 当前处于离线状态。</p>
+                    <div class="mt-5 pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-mono text-slate-500">
+                        <span>REFRESH CYCLE: 06:00:00</span>
+                        <span id="last-sync">LAST SYNC: --</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Verified profile stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 my-6">
+            <div class="cyber-card cyber-cut p-4 border border-cyan-500/30 text-center relative overflow-hidden">
+                <div id="stats-status" class="text-xl md:text-3xl font-orbitron font-bold text-cyan-400">OFFLINE</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">STEAM STATUS</div>
+            </div>
+            <div class="cyber-card cyber-cut p-4 border border-pink-500/30 text-center relative overflow-hidden">
+                <div id="stats-games" class="text-2xl md:text-4xl font-orbitron font-bold text-pink-500">6</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">PUBLIC GAME SIGNALS</div>
+            </div>
+            <div class="cyber-card cyber-cut p-4 border border-purple-500/30 text-center relative overflow-hidden">
+                <div id="stats-hours" class="text-2xl md:text-4xl font-orbitron font-bold text-purple-400">136.6H</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">LISTED TOTAL HOURS</div>
+            </div>
+            <div class="cyber-card cyber-cut p-4 border border-amber-500/30 text-center relative overflow-hidden">
+                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">6H</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">SYNC WINDOW</div>
+            </div>
+        </div>
+
+        <!-- Recent Steam activity -->
+        <section id="recent-games" class="my-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
+                <div>
+                    <p class="font-mono text-[11px] text-pink-400 tracking-[0.25em]">ARCHIVE // PUBLIC GAME ACTIVITY</p>
+                    <h2 class="font-orbitron text-2xl md:text-3xl font-black text-white mt-2">RECENT MISSIONS</h2>
+                </div>
+                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">已验证的 Steam 公开资料快照。连接安全数据接口后，每 6 小时自动同步。</p>
+            </div>
+            <div id="recent-games-grid" class="grid md:grid-cols-2 gap-4" aria-live="polite"></div>
+        </section>
+
+        <!-- Skill Matrix Header -->
+        <h2 class="font-orbitron text-xl md:text-2xl font-bold text-center text-slate-200 mt-10 mb-8 tracking-widest flex items-center justify-center gap-3">
+            <span class="h-px w-12 bg-cyan-500/50"></span>
+            <span>PLAYSTYLE MATRIX // 游戏风格</span>
+            <span class="h-px w-12 bg-cyan-500/50"></span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
+            <!-- Card 1: Precision -->
+            <div class="cyber-card cyber-cut p-6 border border-cyan-500/40 relative group hover:border-cyan-400 cursor-pointer" onclick="playBeep(600)">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-400/50 flex items-center justify-center text-cyan-400 text-2xl shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                        <i class="fa-solid fa-crosshairs"></i>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 bg-cyan-950 text-cyan-400 border border-cyan-800">CELESTE // PORTAL</span>
+                </div>
+                <h3 class="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Precision Runner / 精准操作</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    在高压跳跃与空间谜题之间切换：节奏、路线与肌肉记忆组成一套干净利落的操作逻辑。
+                </p>
+                <div class="space-y-3 font-mono text-xs">
+                    <div>
+                        <div class="flex justify-between mb-1 text-slate-300">
+                            <span>Timing / Route Memory</span>
+                            <span class="text-cyan-400">PRIMARY</span>
+                        </div>
+                        <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-800 overflow-hidden">
+                            <div class="bg-cyan-400 h-full rounded-full glow-pulse" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Investigation -->
+            <div class="cyber-card cyber-cut p-6 border border-pink-500/40 relative group hover:border-pink-400 cursor-pointer" onclick="playBeep(800)">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-pink-500/10 border border-pink-400/50 flex items-center justify-center text-pink-400 text-2xl shadow-[0_0_15px_rgba(255,0,85,0.3)]">
+                        <i class="fa-solid fa-dragon"></i>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 bg-pink-950 text-pink-400 border border-pink-800">UNHEARD // IT TAKES TWO</span>
+                </div>
+                <h3 class="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-pink-400 transition-colors">Signal Detective / 声场推理</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    追踪声音线索、拼接叙事碎片，也享受双人协作里那种必须互相信任的解题节奏。
+                </p>
+                <div class="space-y-3 font-mono text-xs">
+                    <div>
+                        <div class="flex justify-between mb-1 text-slate-300">
+                            <span>Deduction / Co-op</span>
+                            <span class="text-pink-400">ACTIVE</span>
+                        </div>
+                        <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-800 overflow-hidden">
+                            <div class="bg-pink-500 h-full rounded-full glow-pulse" style="width: 86%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Strategy Mind -->
+            <div class="cyber-card cyber-cut p-6 border border-purple-500/40 relative group hover:border-purple-400 cursor-pointer" onclick="playBeep(1000)">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-400/50 flex items-center justify-center text-purple-400 text-2xl shadow-[0_0_15px_rgba(112,0,255,0.3)]">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 bg-purple-950 text-purple-400 border border-purple-800">CIV VI // CS2</span>
+                </div>
+                <h3 class="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Systems Commander / 系统指挥</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    从文明版图的长线运营到短回合战术决策，喜欢读局势、控资源，再把优势兑现。
+                </p>
+                <div class="space-y-3 font-mono text-xs">
+                    <div>
+                        <div class="flex justify-between mb-1 text-slate-300">
+                            <span>Economy / Tactical Read</span>
+                            <span class="text-purple-400">CORE</span>
+                        </div>
+                        <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-800 overflow-hidden">
+                            <div class="bg-purple-500 h-full rounded-full glow-pulse" style="width: 89%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-20 border-t border-slate-800/80 bg-black/60 backdrop-blur-md py-6 px-4 text-center">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-slate-500">
+            <div>
+                © 2026 <span class="text-cyan-400">JASMIN</span>. ALL RIGHTS RESERVED.
+            </div>
+            <div class="flex gap-6 text-slate-400">
+                <a class="hover:text-cyan-400 transition-colors" href="https://steamcommunity.com/profiles/76561199836731858/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-steam mr-1"></i> STEAM</a>
+                <a class="hover:text-pink-400 transition-colors" href="#recent-games"><i class="fa-solid fa-gamepad mr-1"></i> MISSIONS</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" role="status" aria-live="polite" class="fixed z-[60] left-1/2 bottom-6 -translate-x-1/2 translate-y-4 opacity-0 transition-all duration-300 pointer-events-none px-4 py-2 bg-slate-950/95 border border-cyan-500/50 text-cyan-200 text-xs font-mono shadow-[0_0_22px_rgba(0,240,255,0.24)]"></div>
+
+    <script>
+        /* Particle Background Canvas Engine */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.size = Math.random() * 2 + 1;
+                this.color = Math.random() > 0.5 ? '#00f0ff' : '#ff0055';
+                this.alpha = Math.random() * 0.6 + 0.2;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+        function animateBg() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        /* Steam profile feed
+           A public HTML file must never contain a Steam Web API key.
+           Put a safe JSON endpoint here when a server-side proxy is available.
+           Expected shape: { displayName, steamUrl, avatarUrl, status,
+           statusLabel, currentGame, recentGames, source, updatedAt } */
+        const CONFIG = {
+            steamId: '76561199836731858',
+            profileUrl: 'https://steamcommunity.com/profiles/76561199836731858/',
+            dataEndpoint: '',
+            refreshMs: 6 * 60 * 60 * 1000,
+            cacheKey: 'jasmin_steam_profile_v3'
+        };
+
+        const SNAPSHOT = {
+            source: 'steam-public-snapshot',
+            displayName: 'Jasmin',
+            steamUrl: CONFIG.profileUrl,
+            avatarUrl: 'https://avatars.fastly.steamstatic.com/bfd442120857967ca312d18dbded4ad1566c8e12_full.jpg',
+            status: 'offline',
+            statusLabel: 'OFFLINE',
+            currentGame: null,
+            updatedAt: '2026-10-08T17:00:00.000Z',
+            recentGames: [
+                { appId: 504230, name: 'Celeste', recentHours: 16.8, totalHours: 47 },
+                { appId: 942970, name: 'Unheard - Voices of Crime', recentHours: 7.7, totalHours: 8.6 },
+                { appId: 289070, name: "Sid Meier's Civilization VI", recentHours: 6.9, totalHours: 43 },
+                { appId: 400, name: 'Portal', recentHours: 3.3, totalHours: 3.3 },
+                { appId: 730, name: 'Counter-Strike 2', recentHours: 3.1, totalHours: 5.7 },
+                { appId: 1426210, name: 'It Takes Two', recentHours: 2.2, totalHours: 29 }
+            ]
+        };
+
+        const gameImage = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${Number(appId)}/header.jpg`;
+
+        function safeUrl(value, fallback = '') {
+            try {
+                const url = new URL(value, window.location.href);
+                return ['http:', 'https:'].includes(url.protocol) ? url.href : fallback;
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function formatSyncTime(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '--';
+            return new Intl.DateTimeFormat('zh-CN', {
+                month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+            }).format(date);
+        }
+
+        function setStatusTone(status) {
+            const statusEl = document.getElementById('profile-status');
+            const dot = document.getElementById('profile-status-dot');
+            const online = status && status !== 'offline';
+            statusEl.className = online
+                ? 'px-2 py-1 border border-emerald-500/50 bg-emerald-950/50 text-emerald-300 text-[10px] font-mono tracking-widest'
+                : 'px-2 py-1 border border-slate-600/50 bg-slate-900 text-slate-300 text-[10px] font-mono tracking-widest';
+            dot.className = online
+                ? 'status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-4 border-slate-950 text-emerald-400'
+                : 'status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-500 border-4 border-slate-950 text-slate-500';
+        }
+
+        function renderGameCards(games) {
+            const grid = document.getElementById('recent-games-grid');
+            grid.replaceChildren();
+            if (!games.length) {
+                const empty = document.createElement('p');
+                empty.className = 'md:col-span-2 border border-slate-800 bg-black/40 p-6 text-slate-500 font-mono text-sm';
+                empty.textContent = 'NO PUBLIC MISSION DATA // 暂无公开游戏记录';
+                grid.appendChild(empty);
+                return;
+            }
+
+            games.slice(0, 6).forEach((game, index) => {
+                const appId = Number(game.appId || game.appid);
+                const card = document.createElement('a');
+                card.className = 'game-card cyber-card cyber-cut relative overflow-hidden border border-slate-700/70 p-5 flex flex-col justify-between hover:border-cyan-400 transition-colors';
+                card.href = Number.isFinite(appId) ? `https://store.steampowered.com/app/${appId}/` : CONFIG.profileUrl;
+                card.target = '_blank';
+                card.rel = 'noopener noreferrer';
+                const image = safeUrl(game.image, Number.isFinite(appId) ? gameImage(appId) : '');
+                if (image) card.style.backgroundImage = `url("${image.replace(/"/g, '%22')}")`;
+
+                const top = document.createElement('div');
+                top.className = 'flex items-center justify-between gap-3';
+                const mission = document.createElement('span');
+                mission.className = 'font-mono text-[10px] tracking-[0.22em] text-cyan-300';
+                mission.textContent = `MISSION ${String(index + 1).padStart(2, '0')}`;
+                const app = document.createElement('span');
+                app.className = 'font-mono text-[10px] text-slate-500';
+                app.textContent = Number.isFinite(appId) ? `APP // ${appId}` : 'APP // UNKNOWN';
+                top.append(mission, app);
+
+                const info = document.createElement('div');
+                const title = document.createElement('h3');
+                title.className = 'font-orbitron text-xl font-bold text-white leading-tight';
+                title.textContent = game.name || 'Unknown mission';
+                const hours = document.createElement('p');
+                hours.className = 'font-mono text-xs text-slate-300 mt-3';
+                const activity = Number(game.recentHours);
+                const total = Number(game.totalHours);
+                const activityText = Number.isFinite(activity) ? `PUBLIC ACTIVITY ${activity.toFixed(1)}H` : 'PUBLIC ACTIVITY --';
+                const totalText = Number.isFinite(total) ? `TOTAL ${total.toFixed(1)}H` : 'TOTAL --';
+                hours.textContent = `${activityText} // ${totalText}`;
+                info.append(title, hours);
+                card.append(top, info);
+                grid.appendChild(card);
+            });
+        }
+
+        function renderProfile(data) {
+            const games = Array.isArray(data.recentGames) ? data.recentGames : [];
+            const sourceIsLive = data.source === 'steam';
+            const status = String(data.status || 'offline').toLowerCase();
+            const statusLabel = String(data.statusLabel || status || 'UNKNOWN').toUpperCase();
+            const profileUrl = safeUrl(data.steamUrl, CONFIG.profileUrl);
+            const avatar = safeUrl(data.avatarUrl, SNAPSHOT.avatarUrl);
+
+            document.getElementById('profile-avatar').src = avatar;
+            document.getElementById('profile-name').textContent = data.displayName || 'Jasmin';
+            document.getElementById('profile-status').textContent = statusLabel;
+            document.getElementById('profile-source').textContent = sourceIsLive ? 'STEAM API // LIVE' : 'STEAM // VERIFIED SNAPSHOT';
+            document.getElementById('steam-profile-link').href = profileUrl;
+            document.getElementById('stats-status').textContent = status === 'offline' ? 'OFFLINE' : 'ONLINE';
+            document.getElementById('stats-games').textContent = String(games.length);
+            document.getElementById('stats-hours').textContent = `${games.reduce((sum, game) => sum + (Number(game.totalHours) || 0), 0).toFixed(1)}H`;
+            document.getElementById('last-sync').textContent = `LAST SYNC: ${formatSyncTime(data.updatedAt)}`;
+            document.getElementById('system-status').textContent = sourceIsLive
+                ? 'STEAM UPLINK: LIVE // 6H CACHE'
+                : 'STEAM UPLINK: PUBLIC SNAPSHOT // READY';
+            document.getElementById('recent-source-label').textContent = sourceIsLive
+                ? 'Steam Web API 数据已连接；页面按 6 小时缓存周期自动同步。'
+                : '已验证的 Steam 公开资料快照。连接安全数据接口后，每 6 小时自动同步。';
+
+            setStatusTone(status);
+            if (data.currentGame) {
+                document.getElementById('current-game-name').textContent = data.currentGame.name || 'ACTIVE MISSION';
+                const total = Number(data.currentGame.totalHours);
+                document.getElementById('current-game-detail').textContent = Number.isFinite(total)
+                    ? `NOW PLAYING // 累计 ${total.toFixed(1)} 小时`
+                    : 'NOW PLAYING // STEAM SIGNAL ACTIVE';
+            } else {
+                document.getElementById('current-game-name').textContent = 'NO ACTIVE GAME';
+                document.getElementById('current-game-detail').textContent = status === 'offline'
+                    ? 'Jasmin 当前处于离线状态。'
+                    : '在线待命，当前未进入游戏。';
+            }
+            renderGameCards(games);
+        }
+
+        function readCache() {
+            try {
+                const cached = JSON.parse(localStorage.getItem(CONFIG.cacheKey) || 'null');
+                if (!cached || !cached.savedAt || !cached.data) return null;
+                return Date.now() - cached.savedAt < CONFIG.refreshMs ? cached.data : null;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function saveCache(data) {
+            try {
+                localStorage.setItem(CONFIG.cacheKey, JSON.stringify({ savedAt: Date.now(), data }));
+            } catch (_) {}
+        }
+
+        function setSyncing(active) {
+            document.getElementById('refresh-btn').disabled = active;
+            document.getElementById('refresh-icon').classList.toggle('sync-spinner', active);
+        }
+
+        let toastTimer;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('toast-visible');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('toast-visible'), 3200);
+        }
+
+        async function refreshSteamProfile(force = false) {
+            const cached = !force && readCache();
+            if (cached) {
+                renderProfile(cached);
+                return;
+            }
+
+            if (!CONFIG.dataEndpoint) {
+                renderProfile(SNAPSHOT);
+                if (force) showToast('当前使用公开资料快照；安全数据接口接入后可实时同步。');
+                return;
+            }
+
+            setSyncing(true);
+            try {
+                const response = await fetch(CONFIG.dataEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error(`Steam feed ${response.status}`);
+                const data = await response.json();
+                if (!data || !Array.isArray(data.recentGames)) throw new Error('Invalid Steam payload');
+                saveCache(data);
+                renderProfile(data);
+                if (force) showToast('Steam signal synchronized.');
+            } catch (error) {
+                console.warn('Steam sync unavailable; using verified snapshot.', error);
+                renderProfile(readCache() || SNAPSHOT);
+                if (force) showToast('Steam 信号暂时不可用，已切换到资料快照。');
+            } finally {
+                setSyncing(false);
+            }
+        }
+
+        /* Web Audio Synthesizer Tone Effects */
+        let audioEnabled = false;
+        let synth;
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('sfx-icon');
+            const text = document.getElementById('sfx-text');
+
+            if (audioEnabled) {
+                Tone.start();
+                synth = new Tone.Synth().toDestination();
+                icon.className = "fa-solid fa-volume-high text-cyan-400";
+                text.innerText = "AUDIO: ON";
+                playBeep(880);
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+                text.innerText = "AUDIO: OFF";
+            }
+        }
+
+        function playBeep(freq = 440) {
+            if (audioEnabled && synth) {
+                synth.triggerAttackRelease(freq, "8n");
+            }
+        }
+
+        window.addEventListener('load', () => {
+            refreshSteamProfile(false);
+            window.setInterval(() => refreshSteamProfile(true), CONFIG.refreshMs);
+        });
+    </script>
+</body>
+</html>
+
