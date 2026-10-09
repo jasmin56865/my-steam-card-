@@ -452,6 +452,10 @@
                 </span>
                 <span data-i18n="maintenanceNote">This website is continuously maintained by Jasmin. More content is coming soon.</span>
             </p>
+            <p class="mt-2 flex items-start justify-center gap-2 text-[9px] sm:text-[10px] font-mono leading-relaxed tracking-[0.05em] text-slate-700 hover:text-slate-500 transition-colors">
+                <i class="fa-solid fa-shield-halved mt-0.5 text-cyan-900" aria-hidden="true"></i>
+                <span data-i18n="privacyNotice">Visitor analytics: this site automatically records IP address, country or region, and visit time for private statistics. Active records are removed after about 7 days.</span>
+            </p>
         </div>
     </footer>
 
@@ -566,7 +570,8 @@
                 toastSnapshot: '当前使用公开资料快照；接入安全数据接口后可每小时同步。',
                 toastSuccess: 'Steam 信号同步完成。',
                 toastFailure: 'Steam 信号暂时不可用，已保留上次状态。',
-                maintenanceNote: '该网站由 Jasmin 持续维护，更多内容敬请期待。'
+                maintenanceNote: '该网站由 Jasmin 持续维护，更多内容敬请期待。',
+                privacyNotice: '访问统计：本网站会自动记录 IP 地址、国家或地区和访问时间，仅用于私人统计；活动记录约 7 天后清理。'
             },
             en: {
                 audioOff: 'AUDIO: OFF',
@@ -619,7 +624,8 @@
                 toastSnapshot: 'Using the verified public snapshot. Connect a secure endpoint for hourly sync.',
                 toastSuccess: 'Steam signal synchronized.',
                 toastFailure: 'Steam signal unavailable. Keeping the last known status.',
-                maintenanceNote: 'This website is continuously maintained by Jasmin. More content is coming soon.'
+                maintenanceNote: 'This website is continuously maintained by Jasmin. More content is coming soon.',
+                privacyNotice: 'Visitor analytics: this site automatically records IP address, country or region, and visit time for private statistics. Active records are removed after about 7 days.'
             },
             ja: {
                 audioOff: 'サウンド：OFF',
@@ -672,7 +678,8 @@
                 toastSnapshot: '検証済みの公開スナップショットを使用中です。安全なエンドポイントに接続すると、1時間ごとに同期できます。',
                 toastSuccess: 'Steamシグナルを同期しました。',
                 toastFailure: 'Steamシグナルを利用できません。最後に確認したステータスを保持します。',
-                maintenanceNote: 'このウェブサイトはJasminが継続的にメンテナンスしています。今後のコンテンツにもご期待ください。'
+                maintenanceNote: 'このウェブサイトはJasminが継続的にメンテナンスしています。今後のコンテンツにもご期待ください。',
+                privacyNotice: 'アクセス解析：このサイトはIPアドレス、国・地域、訪問時刻を個人用統計のため自動的に記録し、約7日後に削除します。'
             },
             de: {
                 audioOff: 'AUDIO: AUS',
@@ -725,7 +732,8 @@
                 toastSnapshot: 'Verifizierter öffentlicher Snapshot wird verwendet. Verbinde einen sicheren Endpunkt für die stündliche Synchronisierung.',
                 toastSuccess: 'Steam-Signal synchronisiert.',
                 toastFailure: 'Steam-Signal nicht verfügbar. Der letzte bekannte Status bleibt erhalten.',
-                maintenanceNote: 'Diese Website wird kontinuierlich von Jasmin gepflegt. Weitere Inhalte folgen bald.'
+                maintenanceNote: 'Diese Website wird kontinuierlich von Jasmin gepflegt. Weitere Inhalte folgen bald.',
+                privacyNotice: 'Besucherstatistik: Diese Website erfasst automatisch IP-Adresse, Land oder Region und Besuchszeit für private Statistiken; aktive Einträge werden nach etwa 7 Tagen gelöscht.'
             }
         };
 
@@ -1011,6 +1019,40 @@
             refreshSteamProfile(false);
             window.setInterval(() => refreshSteamProfile(false), CONFIG.refreshMs);
         });
+    </script>
+
+    <script>
+        (() => {
+            const WORKER_URL = 'https://jasmin-steam-visitor.zhangjasmin56.workers.dev/collect';
+            const SENT_KEY = 'jasmin_visit_sent_v2';
+
+            async function recordVisit() {
+                try {
+                    if (sessionStorage.getItem(SENT_KEY) === '1') return;
+                } catch (_) {}
+
+                try {
+                    const response = await fetch(WORKER_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        credentials: 'omit',
+                        keepalive: true
+                    });
+
+                    if (response.ok) {
+                        try { sessionStorage.setItem(SENT_KEY, '1'); } catch (_) {}
+                    }
+                } catch (_) {
+                    console.debug('Visitor analytics unavailable.');
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', recordVisit, { once: true });
+            } else {
+                recordVisit();
+            }
+        })();
     </script>
 </body>
 </html>
