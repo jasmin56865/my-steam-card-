@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -279,12 +279,18 @@
                     <span id="hero-title" class="glitch-text" data-text="HELLO, THIS IS JASMIN">HELLO, THIS IS JASMIN</span>
                 </span>
             </h1>
-            <div class="mt-6 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4" aria-label="Language switcher">
-                <button id="lang-zh" type="button" class="lang-switch active cyber-cut group min-w-[190px] px-10 py-4 border border-cyan-400/60 bg-cyan-950/30 font-orbitron text-base sm:text-lg font-black tracking-[0.2em] transition-all" onclick="setLanguage('zh')">
+            <div class="mt-6 mb-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto" aria-label="Language switcher">
+                <button id="lang-en" type="button" aria-pressed="true" class="lang-switch active cyber-cut group w-full px-4 sm:px-7 py-4 border border-cyan-400/60 bg-cyan-950/30 font-orbitron text-sm sm:text-base font-black tracking-[0.12em] transition-all" onclick="setLanguage('en')">
+                    <span class="relative z-10">English</span>
+                </button>
+                <button id="lang-zh" type="button" aria-pressed="false" class="lang-switch cyber-cut group w-full px-4 sm:px-7 py-4 border border-pink-400/60 bg-pink-950/30 font-orbitron text-sm sm:text-base font-black tracking-[0.2em] transition-all" onclick="setLanguage('zh')">
                     <span class="relative z-10">中文</span>
                 </button>
-                <button id="lang-en" type="button" class="lang-switch cyber-cut group min-w-[190px] px-10 py-4 border border-pink-400/60 bg-pink-950/30 font-orbitron text-base sm:text-lg font-black tracking-[0.12em] transition-all" onclick="setLanguage('en')">
-                    <span class="relative z-10">English</span>
+                <button id="lang-ja" type="button" aria-pressed="false" class="lang-switch cyber-cut group w-full px-4 sm:px-7 py-4 border border-purple-400/60 bg-purple-950/30 font-orbitron text-sm sm:text-base font-black tracking-[0.12em] transition-all" onclick="setLanguage('ja')">
+                    <span class="relative z-10">日本語</span>
+                </button>
+                <button id="lang-de" type="button" aria-pressed="false" class="lang-switch cyber-cut group w-full px-4 sm:px-7 py-4 border border-emerald-400/60 bg-emerald-950/30 font-orbitron text-sm sm:text-base font-black tracking-[0.1em] transition-all" onclick="setLanguage('de')">
+                    <span class="relative z-10">Deutsch</span>
                 </button>
             </div>
             <p class="text-cyan-400/90 font-mono text-sm md:text-xl tracking-widest max-w-2xl mx-auto uppercase" data-i18n="heroSubtitle">
@@ -350,7 +356,7 @@
                     <p id="current-game-name" class="font-orbitron text-xl md:text-2xl font-bold text-white">NO ACTIVE GAME</p>
                     <p id="current-game-detail" class="text-sm text-slate-400 mt-2">Jasmin 当前处于离线状态。</p>
                     <div class="mt-5 pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-mono text-slate-500">
-                        <span id="refresh-cycle" data-i18n="refreshCycle">刷新周期：00:01:00</span>
+                        <span id="refresh-cycle" data-i18n="refreshCycle">REFRESH CYCLE: 01:00:00</span>
                         <span id="last-sync">LAST SYNC: --</span>
                     </div>
                 </div>
@@ -372,7 +378,7 @@
                 <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="listedHours">列表累计时长</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-amber-500/30 text-center relative overflow-hidden">
-                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">1M</div>
+                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">1H</div>
                 <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="syncWindow">同步周期</div>
             </div>
         </div>
@@ -437,6 +443,15 @@
                 <a class="hover:text-cyan-400 transition-colors" href="https://steamcommunity.com/profiles/76561199836731858/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-steam mr-1"></i> STEAM</a>
                 <a class="hover:text-pink-400 transition-colors" href="https://github.com/jasmin56865" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github mr-1"></i> GITHUB</a>
             </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-5 pt-4 border-t border-cyan-500/10">
+            <p class="inline-flex items-center justify-center gap-2 text-[10px] sm:text-xs font-mono tracking-[0.1em] sm:tracking-[0.16em] text-slate-500">
+                <span class="relative flex h-2 w-2 shrink-0" aria-hidden="true">
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-70 animate-ping"></span>
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-cyan-400"></span>
+                </span>
+                <span data-i18n="maintenanceNote">This website is continuously maintained by Jasmin. More content is coming soon.</span>
+            </p>
         </div>
     </footer>
 
@@ -514,7 +529,7 @@
                 recentMissionsButton: '最近任务',
                 activeMission: '当前任务',
                 realtimeSlot: '实时状态槽',
-                refreshCycle: '刷新周期：00:01:00',
+                refreshCycle: '刷新周期：01:00:00',
                 steamStatus: 'STEAM 状态',
                 publicSignals: '公开游戏信号',
                 listedHours: '列表累计时长',
@@ -543,13 +558,15 @@
                 nowPlayingHours: '正在游戏 // 累计 {hours} 小时',
                 nowPlayingActive: '正在游戏 // STEAM 信号活跃',
                 noMissionData: '暂无公开游戏记录',
+                unknownMission: '未知任务',
                 mission: '任务',
                 publicActivity: '公开活动',
                 total: '累计',
                 lastSync: '上次同步',
                 toastSnapshot: '当前使用公开资料快照；接入安全数据接口后可每小时同步。',
                 toastSuccess: 'Steam 信号同步完成。',
-                toastFailure: 'Steam 信号暂时不可用，已保留上次状态。'
+                toastFailure: 'Steam 信号暂时不可用，已保留上次状态。',
+                maintenanceNote: '该网站由 Jasmin 持续维护，更多内容敬请期待。'
             },
             en: {
                 audioOff: 'AUDIO: OFF',
@@ -565,7 +582,7 @@
                 recentMissionsButton: 'RECENT MISSIONS',
                 activeMission: 'ACTIVE MISSION',
                 realtimeSlot: 'REAL-TIME SLOT',
-                refreshCycle: 'REFRESH CYCLE: 00:01:00',
+                refreshCycle: 'REFRESH CYCLE: 01:00:00',
                 steamStatus: 'STEAM STATUS',
                 publicSignals: 'PUBLIC GAME SIGNALS',
                 listedHours: 'LISTED TOTAL HOURS',
@@ -594,19 +611,133 @@
                 nowPlayingHours: 'NOW PLAYING // {hours} HOURS TOTAL',
                 nowPlayingActive: 'NOW PLAYING // STEAM SIGNAL ACTIVE',
                 noMissionData: 'NO PUBLIC MISSION DATA',
+                unknownMission: 'UNKNOWN MISSION',
                 mission: 'MISSION',
                 publicActivity: 'PUBLIC ACTIVITY',
                 total: 'TOTAL',
                 lastSync: 'LAST SYNC',
                 toastSnapshot: 'Using the verified public snapshot. Connect a secure endpoint for hourly sync.',
                 toastSuccess: 'Steam signal synchronized.',
-                toastFailure: 'Steam signal unavailable. Keeping the last known status.'
+                toastFailure: 'Steam signal unavailable. Keeping the last known status.',
+                maintenanceNote: 'This website is continuously maintained by Jasmin. More content is coming soon.'
+            },
+            ja: {
+                audioOff: 'サウンド：OFF',
+                audioOn: 'サウンド：ON',
+                syncSteam: 'STEAMを同期',
+                heroBadge: 'STEAM オペレーター // 公開プロフィール',
+                heroTitle: 'HELLO、JASMINです',
+                heroSubtitle: '< サイバーアーカイブへようこそ // PLAYER ONE、準備完了 >',
+                introEyebrow: 'IDENTITY TRANSMISSION // IDシグナル',
+                introTitle: 'HELLO // JASMINです',
+                introBody: '昼は電気電子工学を学び、夜はサイバーハッカーとして活動。回路・信号・システムを読み解き、夜のコード空間で新しいものを創り続けています。好奇心を忘れず、構築を続ける。',
+                openSteam: 'STEAMプロフィールを開く',
+                recentMissionsButton: '最近のミッション',
+                activeMission: '進行中のミッション',
+                realtimeSlot: 'リアルタイム・スロット',
+                refreshCycle: '更新周期：01:00:00',
+                steamStatus: 'STEAMステータス',
+                publicSignals: '公開ゲームシグナル',
+                listedHours: '表示中の合計プレイ時間',
+                syncWindow: '同期周期',
+                archiveEyebrow: 'ARCHIVE // 公開ゲームアクティビティ',
+                recentMissionsTitle: '最近のミッション',
+                socialEyebrow: 'NETWORK // ソーシャルシグナル',
+                socialTitle: 'SOCIAL UPLINK // ソーシャルリンク',
+                socialSubtitle: '暗号化されたチャンネルをたどって、私を見つけてください。コード、ゲーム、そして制作中のすべてが、ここに痕跡を残しています。',
+                githubDescription: 'EE学生として取り組んだリポジトリ、実験プロジェクト、開発ログをご覧ください。',
+                openGithub: 'GITHUBを開く',
+                steamDescription: 'Steamプロフィールで、公開ゲームアーカイブと最新のオンラインシグナルを確認できます。',
+                openSteamSocial: 'STEAMを開く',
+                footerText: 'シグナルはオンラインを維持しています。',
+                sourceLive: 'STEAM API // LIVE',
+                sourceSnapshot: 'STEAM // 検証済みスナップショット',
+                online: 'オンライン',
+                offline: 'オフライン',
+                systemLive: 'STEAMアップリンク：LIVE // 1時間ごとに更新',
+                systemSnapshot: 'STEAMアップリンク：公開スナップショット // READY',
+                recentLive: 'Steamのリアルタイムデータに接続済み。ページは1時間ごとに自動同期されます。',
+                recentSnapshot: '検証済みのSteam公開スナップショットです。安全なデータエンドポイントに接続すると、1時間ごとに自動同期されます。',
+                noActiveGame: '現在プレイ中のゲームはありません',
+                offlineDetail: 'Jasminは現在オフラインです。',
+                onlineIdle: 'オンラインで待機中です。現在プレイ中のゲームはありません。',
+                nowPlayingHours: 'プレイ中 // 累計 {hours} 時間',
+                nowPlayingActive: 'プレイ中 // STEAMシグナル稼働中',
+                noMissionData: '公開ミッションデータはありません',
+                unknownMission: '不明なミッション',
+                mission: 'ミッション',
+                publicActivity: '公開アクティビティ',
+                total: '累計',
+                lastSync: '最終同期',
+                toastSnapshot: '検証済みの公開スナップショットを使用中です。安全なエンドポイントに接続すると、1時間ごとに同期できます。',
+                toastSuccess: 'Steamシグナルを同期しました。',
+                toastFailure: 'Steamシグナルを利用できません。最後に確認したステータスを保持します。',
+                maintenanceNote: 'このウェブサイトはJasminが継続的にメンテナンスしています。今後のコンテンツにもご期待ください。'
+            },
+            de: {
+                audioOff: 'AUDIO: AUS',
+                audioOn: 'AUDIO: AN',
+                syncSteam: 'STEAM SYNCHRONISIEREN',
+                heroBadge: 'STEAM-EINSATZAKTE // ÖFFENTLICHES PROFIL',
+                heroTitle: 'HALLO, HIER IST JASMIN',
+                heroSubtitle: '< WILLKOMMEN IN MEINEM CYBER-ARCHIV // SPIELER EINS BEREIT >',
+                introEyebrow: 'IDENTITÄTSÜBERTRAGUNG // PROFILSIGNAL',
+                introTitle: 'HALLO // HIER IST JASMIN',
+                introBody: 'Tagsüber studiere ich Elektrotechnik, nach Einbruch der Dunkelheit bin ich Cyber-Hackerin. Ich entschlüssele Schaltungen, Signale und Systeme – und baue bis tief in die Nacht. Bleib neugierig. Erschaffe weiter.',
+                openSteam: 'STEAM-PROFIL ÖFFNEN',
+                recentMissionsButton: 'LETZTE MISSIONEN',
+                activeMission: 'AKTIVE MISSION',
+                realtimeSlot: 'ECHTZEIT-SLOT',
+                refreshCycle: 'AKTUALISIERUNG: 01:00:00',
+                steamStatus: 'STEAM-STATUS',
+                publicSignals: 'ÖFFENTLICHE SPIELSIGNALE',
+                listedHours: 'AUFGELISTETE GESAMTSTUNDEN',
+                syncWindow: 'SYNC-INTERVALL',
+                archiveEyebrow: 'ARCHIV // ÖFFENTLICHE SPIELAKTIVITÄT',
+                recentMissionsTitle: 'LETZTE MISSIONEN',
+                socialEyebrow: 'NETZWERK // SOZIALE SIGNALE',
+                socialTitle: 'SOZIALER UPLINK',
+                socialSubtitle: 'Finde mich über diese verschlüsselten Kanäle. Code, Spiele und alles, woran ich arbeite, hinterlassen hier ihre Spuren.',
+                githubDescription: 'Entdecke meine Repositories, Experimente und Entwicklungsprotokolle aus meinem Elektrotechnikstudium.',
+                openGithub: 'GITHUB ÖFFNEN',
+                steamDescription: 'Öffne mein Steam-Profil und entdecke mein öffentliches Spielearchiv sowie mein aktuelles Online-Signal.',
+                openSteamSocial: 'STEAM ÖFFNEN',
+                footerText: 'DAS SIGNAL BLEIBT ONLINE.',
+                sourceLive: 'STEAM API // LIVE',
+                sourceSnapshot: 'STEAM // VERIFIZIERTER SNAPSHOT',
+                online: 'ONLINE',
+                offline: 'OFFLINE',
+                systemLive: 'STEAM-UPLINK: LIVE // AKTUALISIERUNG JEDE STUNDE',
+                systemSnapshot: 'STEAM-UPLINK: ÖFFENTLICHER SNAPSHOT // BEREIT',
+                recentLive: 'Live-Steam-Daten verbunden; diese Seite synchronisiert sich automatisch jede Stunde.',
+                recentSnapshot: 'Verifizierter öffentlicher Steam-Snapshot. Verbinde einen sicheren Datenendpunkt für die stündliche Synchronisierung.',
+                noActiveGame: 'KEIN AKTIVES SPIEL',
+                offlineDetail: 'Jasmin ist derzeit offline.',
+                onlineIdle: 'Online und in Bereitschaft. Derzeit ist kein Spiel aktiv.',
+                nowPlayingHours: 'WIRD GESPIELT // INSGESAMT {hours} STUNDEN',
+                nowPlayingActive: 'WIRD GESPIELT // STEAM-SIGNAL AKTIV',
+                noMissionData: 'KEINE ÖFFENTLICHEN MISSIONSDATEN',
+                unknownMission: 'UNBEKANNTE MISSION',
+                mission: 'MISSION',
+                publicActivity: 'ÖFFENTLICHE AKTIVITÄT',
+                total: 'GESAMT',
+                lastSync: 'LETZTE SYNCHRONISIERUNG',
+                toastSnapshot: 'Verifizierter öffentlicher Snapshot wird verwendet. Verbinde einen sicheren Endpunkt für die stündliche Synchronisierung.',
+                toastSuccess: 'Steam-Signal synchronisiert.',
+                toastFailure: 'Steam-Signal nicht verfügbar. Der letzte bekannte Status bleibt erhalten.',
+                maintenanceNote: 'Diese Website wird kontinuierlich von Jasmin gepflegt. Weitere Inhalte folgen bald.'
             }
         };
 
-        let currentLanguage = localStorage.getItem('jasmin_language') === 'en' ? 'en' : 'zh';
+        const SUPPORTED_LANGUAGES = ['en', 'zh', 'ja', 'de'];
+        const LANGUAGE_STORAGE_KEY = 'jasmin_language_v2';
+        const HTML_LANG = { en: 'en', zh: 'zh-CN', ja: 'ja', de: 'de' };
+        const DATE_LOCALE = { en: 'en-GB', zh: 'zh-CN', ja: 'ja-JP', de: 'de-DE' };
+        let savedLanguage = '';
+        try { savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || ''; } catch (_) {}
+        let currentLanguage = SUPPORTED_LANGUAGES.includes(savedLanguage) ? savedLanguage : 'en';
         let currentProfileData = null;
-        const t = (key) => I18N[currentLanguage][key] || key;
+        const t = (key) => I18N[currentLanguage]?.[key] || I18N.en[key] || key;
 
         const CONFIG = {
             steamId: '76561199836731858',
@@ -636,9 +767,9 @@
         };
 
         function setLanguage(language, rerender = true) {
-            currentLanguage = language === 'en' ? 'en' : 'zh';
-            try { localStorage.setItem('jasmin_language', currentLanguage); } catch (_) {}
-            document.documentElement.lang = currentLanguage === 'zh' ? 'zh-CN' : 'en';
+            currentLanguage = SUPPORTED_LANGUAGES.includes(language) ? language : 'en';
+            try { localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage); } catch (_) {}
+            document.documentElement.lang = HTML_LANG[currentLanguage];
 
             document.querySelectorAll('[data-i18n]').forEach((element) => {
                 const key = element.getAttribute('data-i18n');
@@ -649,7 +780,7 @@
             heroTitle.textContent = t('heroTitle');
             heroTitle.setAttribute('data-text', t('heroTitle'));
 
-            ['zh', 'en'].forEach((code) => {
+            SUPPORTED_LANGUAGES.forEach((code) => {
                 const button = document.getElementById(`lang-${code}`);
                 const active = code === currentLanguage;
                 button.classList.toggle('active', active);
@@ -675,7 +806,7 @@
         function formatSyncTime(value) {
             const date = new Date(value);
             if (Number.isNaN(date.getTime())) return '--';
-            return new Intl.DateTimeFormat(currentLanguage === 'zh' ? 'zh-CN' : 'en-GB', {
+            return new Intl.DateTimeFormat(DATE_LOCALE[currentLanguage], {
                 month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
             }).format(date);
         }
@@ -726,7 +857,7 @@
                 const info = document.createElement('div');
                 const title = document.createElement('h3');
                 title.className = 'font-orbitron text-xl font-bold text-white leading-tight';
-                title.textContent = game.name || (currentLanguage === 'zh' ? '未知任务' : 'Unknown mission');
+                title.textContent = game.name || t('unknownMission');
                 const hours = document.createElement('p');
                 hours.className = 'font-mono text-xs text-slate-300 mt-3';
                 const activity = Number(game.recentHours);
@@ -874,8 +1005,9 @@
             }
         }
 
+        setLanguage(currentLanguage, false);
+
         window.addEventListener('load', () => {
-            setLanguage(currentLanguage, false);
             refreshSteamProfile(false);
             window.setInterval(() => refreshSteamProfile(false), CONFIG.refreshMs);
         });
