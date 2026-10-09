@@ -384,7 +384,7 @@
                     <p class="font-mono text-[11px] text-pink-400 tracking-[0.25em]" data-i18n="archiveEyebrow">ARCHIVE // 公开游戏活动</p>
                     <h2 class="font-orbitron text-2xl md:text-3xl font-black text-white mt-2" data-i18n="recentMissionsTitle">最近任务</h2>
                 </div>
-                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 分钟自动同步。</p>
+                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 小时自动同步。</p>
             </div>
             <div id="recent-games-grid" class="grid md:grid-cols-2 gap-4" aria-live="polite"></div>
         </section>
@@ -533,15 +533,13 @@
                 sourceSnapshot: 'STEAM // 已验证快照',
                 online: '在线',
                 offline: '离线',
-                unknown: '状态未知',
-                systemLive: 'STEAM 链路：实时 // 1 分钟缓存',
+                systemLive: 'STEAM 链路：实时 // 1 小时更新',
                 systemSnapshot: 'STEAM 链路：公开快照 // 已就绪',
-                recentLive: 'Steam Web API 已连接；页面按 1 分钟缓存周期自动同步。',
-                recentSnapshot: '已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 分钟自动同步。',
+                recentLive: 'Steam 实时数据已连接；页面每 1 小时自动同步。',
+                recentSnapshot: '已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 小时自动同步。',
                 noActiveGame: '当前未运行游戏',
                 offlineDetail: 'Jasmin 当前处于离线状态。',
                 onlineIdle: '在线待命，当前未进入游戏。',
-                unknownDetail: '正在等待 Steam 实时状态信号。',
                 nowPlayingHours: '正在游戏 // 累计 {hours} 小时',
                 nowPlayingActive: '正在游戏 // STEAM 信号活跃',
                 noMissionData: '暂无公开游戏记录',
@@ -549,9 +547,9 @@
                 publicActivity: '公开活动',
                 total: '累计',
                 lastSync: '上次同步',
-                toastSnapshot: '当前使用公开资料快照；接入安全数据接口后可每分钟同步。',
+                toastSnapshot: '当前使用公开资料快照；接入安全数据接口后可每小时同步。',
                 toastSuccess: 'Steam 信号同步完成。',
-                toastFailure: 'Steam 信号暂时不可用；状态已标记为未知。'
+                toastFailure: 'Steam 信号暂时不可用，已保留上次状态。'
             },
             en: {
                 audioOff: 'AUDIO: OFF',
@@ -586,15 +584,13 @@
                 sourceSnapshot: 'STEAM // VERIFIED SNAPSHOT',
                 online: 'ONLINE',
                 offline: 'OFFLINE',
-                unknown: 'STATUS UNKNOWN',
-                systemLive: 'STEAM UPLINK: LIVE // 1 MIN CACHE',
+                systemLive: 'STEAM UPLINK: LIVE // 1 HOUR UPDATE',
                 systemSnapshot: 'STEAM UPLINK: PUBLIC SNAPSHOT // READY',
-                recentLive: 'Steam Web API connected; this page syncs on a one-minute cache cycle.',
-                recentSnapshot: 'Verified Steam public snapshot. Connect a secure data endpoint to sync every minute.',
+                recentLive: 'Live Steam data connected; this page syncs automatically every hour.',
+                recentSnapshot: 'Verified Steam public snapshot. Connect a secure data endpoint to sync every hour.',
                 noActiveGame: 'NO ACTIVE GAME',
                 offlineDetail: 'Jasmin is currently offline.',
                 onlineIdle: 'Online and standing by. No game is active.',
-                unknownDetail: 'Waiting for a live Steam status signal.',
                 nowPlayingHours: 'NOW PLAYING // {hours} HOURS TOTAL',
                 nowPlayingActive: 'NOW PLAYING // STEAM SIGNAL ACTIVE',
                 noMissionData: 'NO PUBLIC MISSION DATA',
@@ -602,9 +598,9 @@
                 publicActivity: 'PUBLIC ACTIVITY',
                 total: 'TOTAL',
                 lastSync: 'LAST SYNC',
-                toastSnapshot: 'Using the verified public snapshot. Connect a secure endpoint for one-minute sync.',
+                toastSnapshot: 'Using the verified public snapshot. Connect a secure endpoint for hourly sync.',
                 toastSuccess: 'Steam signal synchronized.',
-                toastFailure: 'Steam signal unavailable. Status marked as unknown.'
+                toastFailure: 'Steam signal unavailable. Keeping the last known status.'
             }
         };
 
@@ -616,8 +612,8 @@
             steamId: '76561199836731858',
             profileUrl: 'https://steamcommunity.com/profiles/76561199836731858/',
             dataEndpoint: 'https://jasmin-game-archive.spicyeagle8.chatgpt.site/api/steam',
-            refreshMs: 60 * 1000,
-            cacheKey: 'jasmin_steam_profile_v6'
+            refreshMs: 60 * 60 * 1000,
+            cacheKey: 'jasmin_steam_profile_v7'
         };
 
         const SNAPSHOT = {
@@ -625,8 +621,8 @@
             displayName: 'Jasmin',
             steamUrl: CONFIG.profileUrl,
             avatarUrl: 'https://avatars.fastly.steamstatic.com/bfd442120857967ca312d18dbded4ad1566c8e12_full.jpg',
-            status: 'unknown',
-            statusLabel: 'STATUS UNKNOWN',
+            status: 'offline',
+            statusLabel: 'OFFLINE',
             currentGame: null,
             updatedAt: '2026-10-09T09:00:00.000Z',
             recentGames: [
@@ -667,8 +663,9 @@
         const gameImage = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${Number(appId)}/header.jpg`;
 
         function safeUrl(value, fallback = '') {
+            if (typeof value !== 'string' || !value.trim()) return fallback;
             try {
-                const url = new URL(value, window.location.href);
+                const url = new URL(value.trim(), window.location.href);
                 return ['http:', 'https:'].includes(url.protocol) ? url.href : fallback;
             } catch (_) {
                 return fallback;
@@ -686,18 +683,13 @@
         function setStatusTone(status) {
             const statusEl = document.getElementById('profile-status');
             const dot = document.getElementById('profile-status-dot');
-            const unknown = !status || status === 'unknown' || status === 'error';
-            const online = !unknown && status !== 'offline';
+            const online = status && status !== 'offline';
             statusEl.className = online
                 ? 'px-2 py-1 border border-emerald-500/50 bg-emerald-950/50 text-emerald-300 text-[10px] font-mono tracking-widest'
-                : unknown
-                    ? 'px-2 py-1 border border-amber-500/50 bg-amber-950/50 text-amber-300 text-[10px] font-mono tracking-widest'
-                    : 'px-2 py-1 border border-slate-600/50 bg-slate-900 text-slate-300 text-[10px] font-mono tracking-widest';
+                : 'px-2 py-1 border border-slate-600/50 bg-slate-900 text-slate-300 text-[10px] font-mono tracking-widest';
             dot.className = online
                 ? 'status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-4 border-slate-950 text-emerald-400'
-                : unknown
-                    ? 'status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-400 border-4 border-slate-950 text-amber-400'
-                    : 'status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-500 border-4 border-slate-950 text-slate-500';
+                : 'status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-500 border-4 border-slate-950 text-slate-500';
         }
 
         function renderGameCards(games) {
@@ -752,9 +744,8 @@
             currentProfileData = data;
             const games = Array.isArray(data.recentGames) ? data.recentGames : [];
             const sourceIsLive = data.source === 'steam';
-            const status = String(data.status || 'unknown').toLowerCase();
-            const statusIsUnknown = status === 'unknown' || status === 'error';
-            const statusLabel = statusIsUnknown ? t('unknown') : status === 'offline' ? t('offline') : t('online');
+            const status = String(data.status || 'offline').toLowerCase();
+            const statusLabel = status === 'offline' ? t('offline') : t('online');
             const profileUrl = safeUrl(data.steamUrl, CONFIG.profileUrl);
             const avatar = safeUrl(data.avatarUrl, SNAPSHOT.avatarUrl);
 
@@ -783,11 +774,9 @@
                     : t('nowPlayingActive');
             } else {
                 document.getElementById('current-game-name').textContent = t('noActiveGame');
-                document.getElementById('current-game-detail').textContent = statusIsUnknown
-                    ? t('unknownDetail')
-                    : status === 'offline'
-                        ? t('offlineDetail')
-                        : t('onlineIdle');
+                document.getElementById('current-game-detail').textContent = status === 'offline'
+                    ? t('offlineDetail')
+                    : t('onlineIdle');
             }
             renderGameCards(games);
         }
