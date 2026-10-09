@@ -175,6 +175,29 @@
             transform: translate(-50%, 0) !important;
         }
 
+        .lang-switch {
+            border: 1px solid rgba(100, 116, 139, 0.5);
+            color: #94a3b8;
+            background: rgba(2, 6, 23, 0.72);
+        }
+
+        .lang-switch.active {
+            color: #020617;
+            border-color: var(--neon-cyan);
+            background: var(--neon-cyan);
+            box-shadow: 0 0 16px rgba(0, 240, 255, 0.38);
+        }
+
+        .signal-line {
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), transparent);
+            background-size: 200% 100%;
+            animation: signal-flow 3s linear infinite;
+        }
+
+        @keyframes signal-flow {
+            to { background-position: -200% 0; }
+        }
+
         :focus-visible {
             outline: 2px solid var(--neon-yellow);
             outline-offset: 4px;
@@ -215,7 +238,7 @@
     <div class="fixed bottom-1/4 right-10 w-96 h-96 bg-fuchsia-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <!-- Top Navigation Header -->
-    <header class="relative z-20 w-full px-6 py-4 flex justify-between items-center border-b border-cyan-500/20 bg-black/40 backdrop-blur-md">
+    <header class="relative z-20 w-full px-4 md:px-6 py-4 flex flex-wrap justify-between items-center gap-3 border-b border-cyan-500/20 bg-black/40 backdrop-blur-md">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg border border-cyan-400/50 bg-cyan-950/40 flex items-center justify-center text-cyan-400 font-bold text-xl shadow-[0_0_10px_rgba(0,240,255,0.4)]">
                 <i class="fa-solid font-orbitron">J</i>
@@ -229,14 +252,18 @@
         </div>
 
         <!-- Audio & Sync Controls -->
-        <div class="flex items-center gap-3 md:gap-4">
+        <div class="flex flex-wrap items-center justify-end gap-2 md:gap-3">
+            <div class="flex items-center gap-1 p-1 border border-slate-800 bg-black/50" aria-label="Language switcher">
+                <button id="lang-zh" type="button" class="lang-switch active px-3 py-1.5 text-[11px] font-mono transition-all" onclick="setLanguage('zh')">中文</button>
+                <button id="lang-en" type="button" class="lang-switch px-3 py-1.5 text-[11px] font-mono transition-all" onclick="setLanguage('en')">English</button>
+            </div>
             <button id="sfx-btn" onclick="toggleAudio()" class="cyber-btn bg-slate-900 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 hover:text-white px-3 py-1.5 md:px-4 md:py-2 text-xs font-mono flex items-center gap-2 transition-all">
                 <i class="fa-solid fa-volume-xmark" id="sfx-icon"></i>
-                <span id="sfx-text" class="hidden sm:inline">AUDIO: OFF</span>
+                <span id="sfx-text" class="hidden sm:inline" data-i18n="audioOff">音效：关</span>
             </button>
             <button id="refresh-btn" onclick="refreshSteamProfile(true)" class="cyber-btn bg-pink-950/50 border border-pink-500/50 hover:border-pink-400 text-pink-400 hover:text-white px-3 py-1.5 md:px-4 md:py-2 text-xs font-mono flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(255,0,85,0.2)]">
                 <i id="refresh-icon" class="fa-solid fa-rotate"></i>
-                <span class="hidden sm:inline">SYNC STEAM</span>
+                <span class="hidden sm:inline" data-i18n="syncSteam">同步 STEAM</span>
             </button>
         </div>
     </header>
@@ -247,19 +274,41 @@
             <!-- Subtitle badge -->
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/40 bg-pink-950/30 text-pink-400 text-xs md:text-sm font-mono tracking-widest uppercase mb-6 shadow-[0_0_15px_rgba(255,0,85,0.2)]">
                 <i class="fa-solid fa-gamepad text-pink-400 animate-bounce"></i>
-                <span>Steam Operative // Public Profile</span>
+                <span data-i18n="heroBadge">STEAM 特勤档案 // 公开资料</span>
             </div>
 
             <!-- Main Glitch Greeting Text -->
             <h1 class="font-orbitron text-3xl sm:text-5xl md:text-7xl font-black tracking-tight text-white mb-4">
                 <span class="glitch-wrapper">
-                    <span class="glitch-text" data-text="HELLO, THIS IS JASMIN">HELLO, THIS IS JASMIN</span>
+                    <span id="hero-title" class="glitch-text" data-text="HELLO, THIS IS JASMIN">HELLO, THIS IS JASMIN</span>
                 </span>
             </h1>
-            <p class="text-cyan-400/90 font-mono text-sm md:text-xl tracking-widest max-w-2xl mx-auto uppercase">
-                &lt; 欢迎进入我的赛博游戏档案 // READY PLAYER ONE &gt;
+            <p class="text-cyan-400/90 font-mono text-sm md:text-xl tracking-widest max-w-2xl mx-auto uppercase" data-i18n="heroSubtitle">
+                &lt; 欢迎进入我的赛博档案 // 玩家一号已就位 &gt;
             </p>
         </div>
+
+        <!-- Personal identity transmission -->
+        <section class="cyber-card cyber-cut border border-pink-500/35 p-5 md:p-7 my-4 relative overflow-hidden">
+            <div class="signal-line absolute top-0 left-0 right-0 h-px opacity-80"></div>
+            <div class="grid md:grid-cols-[0.75fr_1.25fr] gap-6 items-center">
+                <div class="font-mono-code text-xs text-slate-500 space-y-2 border-l-2 border-cyan-400/60 pl-4">
+                    <p><span class="text-cyan-400">root@jasmin</span>:~$ whoami</p>
+                    <p class="text-pink-400">EE_STUDENT // CYBER_HACKER</p>
+                    <p class="text-purple-300">SIGNAL_LOCKED // PORT_56865</p>
+                </div>
+                <div>
+                    <p class="text-[11px] font-mono tracking-[0.28em] text-pink-400" data-i18n="introEyebrow">IDENTITY TRANSMISSION // 身份广播</p>
+                    <h2 class="font-orbitron text-2xl md:text-4xl font-black text-white mt-2" data-i18n="introTitle">HELLO // 这里是 JASMIN</h2>
+                    <p class="text-slate-300 mt-3 leading-relaxed" data-i18n="introBody">白天研究电路、信号与系统，夜晚穿梭在代码与赛博空间。EE Student by day, cyber hacker after dark——保持好奇，持续构建。</p>
+                    <div class="flex flex-wrap gap-2 mt-4 font-mono text-[10px] tracking-widest">
+                        <span class="px-3 py-1.5 border border-cyan-500/40 bg-cyan-950/30 text-cyan-300">EE STUDENT</span>
+                        <span class="px-3 py-1.5 border border-pink-500/40 bg-pink-950/30 text-pink-300">CYBER HACKER</span>
+                        <span class="px-3 py-1.5 border border-purple-500/40 bg-purple-950/30 text-purple-300">GAME OPERATIVE</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Steam identity and active mission -->
         <section class="cyber-card cyber-cut border border-cyan-500/40 p-5 md:p-7 my-6 relative overflow-hidden shadow-[0_0_28px_rgba(0,240,255,0.12)]">
@@ -267,7 +316,7 @@
             <div class="relative grid lg:grid-cols-[1.1fr_0.9fr] gap-7 items-center">
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
                     <div class="relative shrink-0">
-                        <img id="profile-avatar" class="profile-avatar w-28 h-28 md:w-36 md:h-36 object-cover cyber-cut bg-slate-900" alt="Jasmin 的 Steam 头像" referrerpolicy="no-referrer">
+                        <img id="profile-avatar" class="profile-avatar w-28 h-28 md:w-36 md:h-36 object-cover cyber-cut bg-slate-900" alt="Jasmin Steam avatar" referrerpolicy="no-referrer">
                         <span id="profile-status-dot" class="status-dot absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-500 border-4 border-slate-950 text-slate-500"></span>
                     </div>
                     <div class="min-w-0">
@@ -277,13 +326,13 @@
                         </div>
                         <h2 id="profile-name" class="font-orbitron text-3xl md:text-5xl font-black text-white tracking-tight">Jasmin</h2>
                         <p class="font-mono text-xs text-slate-500 mt-1">STEAM_ID64 // 76561199836731858</p>
-                        <p class="text-slate-300 mt-4 max-w-xl leading-relaxed">精确跳跃、谜题推理、文明规划与战术对局——这里记录我的公开 Steam 作战轨迹。</p>
+                        <p class="text-slate-300 mt-4 max-w-xl leading-relaxed font-mono italic">It is not just time that cannot be reclaimed.</p>
                         <div class="flex flex-wrap justify-center sm:justify-start gap-3 mt-5">
                             <a id="steam-profile-link" href="https://steamcommunity.com/profiles/76561199836731858/" target="_blank" rel="noopener noreferrer" class="cyber-btn inline-flex items-center gap-2 bg-cyan-500 text-slate-950 font-bold px-5 py-2.5 text-sm hover:bg-white transition-colors">
-                                <i class="fa-brands fa-steam"></i> OPEN STEAM PROFILE
+                                <i class="fa-brands fa-steam"></i> <span data-i18n="openSteam">打开 STEAM 主页</span>
                             </a>
                             <a href="#recent-games" class="cyber-btn inline-flex items-center gap-2 border border-pink-500/60 text-pink-300 bg-pink-950/30 px-5 py-2.5 text-sm hover:text-white hover:border-pink-300 transition-colors">
-                                <i class="fa-solid fa-bolt"></i> RECENT MISSIONS
+                                <i class="fa-solid fa-bolt"></i> <span data-i18n="recentMissionsButton">最近任务</span>
                             </a>
                         </div>
                     </div>
@@ -291,13 +340,13 @@
 
                 <div class="bg-black/55 border border-pink-500/30 p-5 cyber-cut">
                     <div class="flex items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
-                        <span class="font-orbitron text-sm text-pink-300 tracking-widest">ACTIVE MISSION</span>
-                        <span class="text-[10px] font-mono text-slate-500">REAL-TIME SLOT</span>
+                        <span class="font-orbitron text-sm text-pink-300 tracking-widest" data-i18n="activeMission">当前任务</span>
+                        <span class="text-[10px] font-mono text-slate-500" data-i18n="realtimeSlot">实时状态槽</span>
                     </div>
                     <p id="current-game-name" class="font-orbitron text-xl md:text-2xl font-bold text-white">NO ACTIVE GAME</p>
                     <p id="current-game-detail" class="text-sm text-slate-400 mt-2">Jasmin 当前处于离线状态。</p>
                     <div class="mt-5 pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-mono text-slate-500">
-                        <span>REFRESH CYCLE: 06:00:00</span>
+                        <span id="refresh-cycle" data-i18n="refreshCycle">刷新周期：00:01:00</span>
                         <span id="last-sync">LAST SYNC: --</span>
                     </div>
                 </div>
@@ -308,19 +357,19 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 my-6">
             <div class="cyber-card cyber-cut p-4 border border-cyan-500/30 text-center relative overflow-hidden">
                 <div id="stats-status" class="text-xl md:text-3xl font-orbitron font-bold text-cyan-400">OFFLINE</div>
-                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">STEAM STATUS</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="steamStatus">STEAM 状态</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-pink-500/30 text-center relative overflow-hidden">
                 <div id="stats-games" class="text-2xl md:text-4xl font-orbitron font-bold text-pink-500">6</div>
-                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">PUBLIC GAME SIGNALS</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="publicSignals">公开游戏信号</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-purple-500/30 text-center relative overflow-hidden">
                 <div id="stats-hours" class="text-2xl md:text-4xl font-orbitron font-bold text-purple-400">136.6H</div>
-                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">LISTED TOTAL HOURS</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="listedHours">列表累计时长</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-amber-500/30 text-center relative overflow-hidden">
-                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">6H</div>
-                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1">SYNC WINDOW</div>
+                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">1M</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="syncWindow">同步周期</div>
             </div>
         </div>
 
@@ -328,108 +377,61 @@
         <section id="recent-games" class="my-8">
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
                 <div>
-                    <p class="font-mono text-[11px] text-pink-400 tracking-[0.25em]">ARCHIVE // PUBLIC GAME ACTIVITY</p>
-                    <h2 class="font-orbitron text-2xl md:text-3xl font-black text-white mt-2">RECENT MISSIONS</h2>
+                    <p class="font-mono text-[11px] text-pink-400 tracking-[0.25em]" data-i18n="archiveEyebrow">ARCHIVE // 公开游戏活动</p>
+                    <h2 class="font-orbitron text-2xl md:text-3xl font-black text-white mt-2" data-i18n="recentMissionsTitle">最近任务</h2>
                 </div>
-                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">已验证的 Steam 公开资料快照。连接安全数据接口后，每 6 小时自动同步。</p>
+                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 分钟自动同步。</p>
             </div>
             <div id="recent-games-grid" class="grid md:grid-cols-2 gap-4" aria-live="polite"></div>
         </section>
 
-        <!-- Skill Matrix Header -->
-        <h2 class="font-orbitron text-xl md:text-2xl font-bold text-center text-slate-200 mt-10 mb-8 tracking-widest flex items-center justify-center gap-3">
-            <span class="h-px w-12 bg-cyan-500/50"></span>
-            <span>PLAYSTYLE MATRIX // 游戏风格</span>
-            <span class="h-px w-12 bg-cyan-500/50"></span>
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-            <!-- Card 1: Precision -->
-            <div class="cyber-card cyber-cut p-6 border border-cyan-500/40 relative group hover:border-cyan-400 cursor-pointer" onclick="playBeep(600)">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-400/50 flex items-center justify-center text-cyan-400 text-2xl shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-                        <i class="fa-solid fa-crosshairs"></i>
-                    </div>
-                    <span class="text-xs font-mono px-2 py-1 bg-cyan-950 text-cyan-400 border border-cyan-800">CELESTE // PORTAL</span>
-                </div>
-                <h3 class="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Precision Runner / 精准操作</h3>
-                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                    在高压跳跃与空间谜题之间切换：节奏、路线与肌肉记忆组成一套干净利落的操作逻辑。
-                </p>
-                <div class="space-y-3 font-mono text-xs">
-                    <div>
-                        <div class="flex justify-between mb-1 text-slate-300">
-                            <span>Timing / Route Memory</span>
-                            <span class="text-cyan-400">PRIMARY</span>
-                        </div>
-                        <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-800 overflow-hidden">
-                            <div class="bg-cyan-400 h-full rounded-full glow-pulse" style="width: 92%"></div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Social uplink -->
+        <section class="my-10">
+            <div class="text-center mb-7">
+                <p class="font-mono text-[11px] text-cyan-400 tracking-[0.28em]" data-i18n="socialEyebrow">NETWORK // 社交信号</p>
+                <h2 class="font-orbitron text-2xl md:text-3xl font-black text-white mt-2" data-i18n="socialTitle">SOCIAL UPLINK // 社交平台</h2>
+                <p class="text-slate-400 text-sm mt-3 max-w-2xl mx-auto" data-i18n="socialSubtitle">沿着这些加密信道找到我。代码、游戏与正在构建的东西，都在这里留下痕迹。</p>
             </div>
 
-            <!-- Card 2: Investigation -->
-            <div class="cyber-card cyber-cut p-6 border border-pink-500/40 relative group hover:border-pink-400 cursor-pointer" onclick="playBeep(800)">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-lg bg-pink-500/10 border border-pink-400/50 flex items-center justify-center text-pink-400 text-2xl shadow-[0_0_15px_rgba(255,0,85,0.3)]">
-                        <i class="fa-solid fa-dragon"></i>
-                    </div>
-                    <span class="text-xs font-mono px-2 py-1 bg-pink-950 text-pink-400 border border-pink-800">UNHEARD // IT TAKES TWO</span>
-                </div>
-                <h3 class="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-pink-400 transition-colors">Signal Detective / 声场推理</h3>
-                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                    追踪声音线索、拼接叙事碎片，也享受双人协作里那种必须互相信任的解题节奏。
-                </p>
-                <div class="space-y-3 font-mono text-xs">
-                    <div>
-                        <div class="flex justify-between mb-1 text-slate-300">
-                            <span>Deduction / Co-op</span>
-                            <span class="text-pink-400">ACTIVE</span>
+            <div class="grid md:grid-cols-2 gap-5">
+                <a href="https://github.com/jasmin56865" target="_blank" rel="noopener noreferrer" class="cyber-card cyber-cut border border-cyan-500/40 p-6 group hover:border-cyan-300 block">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-14 h-14 border border-cyan-400/50 bg-cyan-950/40 flex items-center justify-center text-cyan-300 text-3xl shadow-[0_0_18px_rgba(0,240,255,0.2)]">
+                            <i class="fa-brands fa-github"></i>
                         </div>
-                        <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-800 overflow-hidden">
-                            <div class="bg-pink-500 h-full rounded-full glow-pulse" style="width: 86%"></div>
-                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-cyan-500/60 group-hover:text-cyan-300 transition-colors"></i>
                     </div>
-                </div>
-            </div>
+                    <p class="font-mono text-[10px] tracking-[0.25em] text-cyan-400 mt-6">CODE REPOSITORY</p>
+                    <h3 class="font-orbitron text-2xl font-bold text-white mt-1">GitHub // jasmin56865</h3>
+                    <p class="text-slate-400 mt-3 leading-relaxed" data-i18n="githubDescription">查看我的代码仓库、实验项目与 EE 学生的构建日志。</p>
+                    <span class="inline-flex items-center gap-2 mt-5 text-xs font-mono text-cyan-300"><span data-i18n="openGithub">打开 GITHUB</span> <i class="fa-solid fa-chevron-right"></i></span>
+                </a>
 
-            <!-- Card 3: Strategy Mind -->
-            <div class="cyber-card cyber-cut p-6 border border-purple-500/40 relative group hover:border-purple-400 cursor-pointer" onclick="playBeep(1000)">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-400/50 flex items-center justify-center text-purple-400 text-2xl shadow-[0_0_15px_rgba(112,0,255,0.3)]">
-                        <i class="fa-solid fa-brain"></i>
-                    </div>
-                    <span class="text-xs font-mono px-2 py-1 bg-purple-950 text-purple-400 border border-purple-800">CIV VI // CS2</span>
-                </div>
-                <h3 class="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Systems Commander / 系统指挥</h3>
-                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
-                    从文明版图的长线运营到短回合战术决策，喜欢读局势、控资源，再把优势兑现。
-                </p>
-                <div class="space-y-3 font-mono text-xs">
-                    <div>
-                        <div class="flex justify-between mb-1 text-slate-300">
-                            <span>Economy / Tactical Read</span>
-                            <span class="text-purple-400">CORE</span>
+                <a href="https://steamcommunity.com/profiles/76561199836731858/" target="_blank" rel="noopener noreferrer" class="cyber-card cyber-cut border border-pink-500/40 p-6 group hover:border-pink-300 block">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-14 h-14 border border-pink-400/50 bg-pink-950/40 flex items-center justify-center text-pink-300 text-3xl shadow-[0_0_18px_rgba(255,0,85,0.2)]">
+                            <i class="fa-brands fa-steam"></i>
                         </div>
-                        <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-800 overflow-hidden">
-                            <div class="bg-purple-500 h-full rounded-full glow-pulse" style="width: 89%"></div>
-                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-pink-500/60 group-hover:text-pink-300 transition-colors"></i>
                     </div>
-                </div>
+                    <p class="font-mono text-[10px] tracking-[0.25em] text-pink-400 mt-6">GAME NETWORK</p>
+                    <h3 class="font-orbitron text-2xl font-bold text-white mt-1">Steam // Jasmin</h3>
+                    <p class="text-slate-400 mt-3 leading-relaxed" data-i18n="steamDescription">进入我的 Steam 主页，查看公开游戏档案与最新在线信号。</p>
+                    <span class="inline-flex items-center gap-2 mt-5 text-xs font-mono text-pink-300"><span data-i18n="openSteamSocial">打开 STEAM</span> <i class="fa-solid fa-chevron-right"></i></span>
+                </a>
             </div>
-        </div>
+        </section>
     </main>
 
     <!-- Footer -->
     <footer class="relative z-20 border-t border-slate-800/80 bg-black/60 backdrop-blur-md py-6 px-4 text-center">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-slate-500">
             <div>
-                © 2026 <span class="text-cyan-400">JASMIN</span>. ALL RIGHTS RESERVED.
+                © 2026 <span class="text-cyan-400">JASMIN</span>. <span data-i18n="footerText">信号持续在线。</span>
             </div>
             <div class="flex gap-6 text-slate-400">
                 <a class="hover:text-cyan-400 transition-colors" href="https://steamcommunity.com/profiles/76561199836731858/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-steam mr-1"></i> STEAM</a>
-                <a class="hover:text-pink-400 transition-colors" href="#recent-games"><i class="fa-solid fa-gamepad mr-1"></i> MISSIONS</a>
+                <a class="hover:text-pink-400 transition-colors" href="https://github.com/jasmin56865" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github mr-1"></i> GITHUB</a>
             </div>
         </div>
     </footer>
@@ -493,12 +495,121 @@
            Put a safe JSON endpoint here when a server-side proxy is available.
            Expected shape: { displayName, steamUrl, avatarUrl, status,
            statusLabel, currentGame, recentGames, source, updatedAt } */
+        const I18N = {
+            zh: {
+                audioOff: '音效：关',
+                audioOn: '音效：开',
+                syncSteam: '同步 STEAM',
+                heroBadge: 'STEAM 特勤档案 // 公开资料',
+                heroTitle: '你好，这里是 JASMIN',
+                heroSubtitle: '< 欢迎进入我的赛博档案 // 玩家一号已就位 >',
+                introEyebrow: 'IDENTITY TRANSMISSION // 身份广播',
+                introTitle: 'HELLO // 这里是 JASMIN',
+                introBody: '电气电子工程学生，白天解码电路、信号与系统，夜晚穿行于代码和赛博空间。保持好奇，持续构建。',
+                openSteam: '打开 STEAM 主页',
+                recentMissionsButton: '最近任务',
+                activeMission: '当前任务',
+                realtimeSlot: '实时状态槽',
+                refreshCycle: '刷新周期：00:01:00',
+                steamStatus: 'STEAM 状态',
+                publicSignals: '公开游戏信号',
+                listedHours: '列表累计时长',
+                syncWindow: '同步周期',
+                archiveEyebrow: 'ARCHIVE // 公开游戏活动',
+                recentMissionsTitle: '最近任务',
+                socialEyebrow: 'NETWORK // 社交信号',
+                socialTitle: 'SOCIAL UPLINK // 社交平台',
+                socialSubtitle: '沿着这些加密信道找到我。代码、游戏与正在构建的东西，都在这里留下痕迹。',
+                githubDescription: '查看我的代码仓库、实验项目与 EE 学生的构建日志。',
+                openGithub: '打开 GITHUB',
+                steamDescription: '进入我的 Steam 主页，查看公开游戏档案与最新在线信号。',
+                openSteamSocial: '打开 STEAM',
+                footerText: '信号持续在线。',
+                sourceLive: 'STEAM API // 实时',
+                sourceSnapshot: 'STEAM // 已验证快照',
+                online: '在线',
+                offline: '离线',
+                systemLive: 'STEAM 链路：实时 // 1 分钟缓存',
+                systemSnapshot: 'STEAM 链路：公开快照 // 已就绪',
+                recentLive: 'Steam Web API 已连接；页面按 1 分钟缓存周期自动同步。',
+                recentSnapshot: '已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 分钟自动同步。',
+                noActiveGame: '当前未运行游戏',
+                offlineDetail: 'Jasmin 当前处于离线状态。',
+                onlineIdle: '在线待命，当前未进入游戏。',
+                nowPlayingHours: '正在游戏 // 累计 {hours} 小时',
+                nowPlayingActive: '正在游戏 // STEAM 信号活跃',
+                noMissionData: '暂无公开游戏记录',
+                mission: '任务',
+                publicActivity: '公开活动',
+                total: '累计',
+                lastSync: '上次同步',
+                toastSnapshot: '当前使用公开资料快照；接入安全数据接口后可每分钟同步。',
+                toastSuccess: 'Steam 信号同步完成。',
+                toastFailure: 'Steam 信号暂时不可用，已切换到资料快照。'
+            },
+            en: {
+                audioOff: 'AUDIO: OFF',
+                audioOn: 'AUDIO: ON',
+                syncSteam: 'SYNC STEAM',
+                heroBadge: 'STEAM OPERATIVE // PUBLIC PROFILE',
+                heroTitle: 'HELLO, THIS IS JASMIN',
+                heroSubtitle: '< WELCOME TO MY CYBER ARCHIVE // READY PLAYER ONE >',
+                introEyebrow: 'IDENTITY TRANSMISSION // PROFILE SIGNAL',
+                introTitle: 'HELLO // THIS IS JASMIN',
+                introBody: 'EE student by day, cyber hacker after dark. I decode circuits, signals, and systems—then build through the night. Stay curious. Keep creating.',
+                openSteam: 'OPEN STEAM PROFILE',
+                recentMissionsButton: 'RECENT MISSIONS',
+                activeMission: 'ACTIVE MISSION',
+                realtimeSlot: 'REAL-TIME SLOT',
+                refreshCycle: 'REFRESH CYCLE: 00:01:00',
+                steamStatus: 'STEAM STATUS',
+                publicSignals: 'PUBLIC GAME SIGNALS',
+                listedHours: 'LISTED TOTAL HOURS',
+                syncWindow: 'SYNC WINDOW',
+                archiveEyebrow: 'ARCHIVE // PUBLIC GAME ACTIVITY',
+                recentMissionsTitle: 'RECENT MISSIONS',
+                socialEyebrow: 'NETWORK // SOCIAL SIGNALS',
+                socialTitle: 'SOCIAL UPLINK',
+                socialSubtitle: 'Find me across these encrypted channels. Code, games, and everything I am building leave a trace here.',
+                githubDescription: 'Explore my repositories, experiments, and build logs from an EE student.',
+                openGithub: 'OPEN GITHUB',
+                steamDescription: 'Enter my Steam profile to inspect the public game archive and latest online signal.',
+                openSteamSocial: 'OPEN STEAM',
+                footerText: 'SIGNAL REMAINS ONLINE.',
+                sourceLive: 'STEAM API // LIVE',
+                sourceSnapshot: 'STEAM // VERIFIED SNAPSHOT',
+                online: 'ONLINE',
+                offline: 'OFFLINE',
+                systemLive: 'STEAM UPLINK: LIVE // 1 MIN CACHE',
+                systemSnapshot: 'STEAM UPLINK: PUBLIC SNAPSHOT // READY',
+                recentLive: 'Steam Web API connected; this page syncs on a one-minute cache cycle.',
+                recentSnapshot: 'Verified Steam public snapshot. Connect a secure data endpoint to sync every minute.',
+                noActiveGame: 'NO ACTIVE GAME',
+                offlineDetail: 'Jasmin is currently offline.',
+                onlineIdle: 'Online and standing by. No game is active.',
+                nowPlayingHours: 'NOW PLAYING // {hours} HOURS TOTAL',
+                nowPlayingActive: 'NOW PLAYING // STEAM SIGNAL ACTIVE',
+                noMissionData: 'NO PUBLIC MISSION DATA',
+                mission: 'MISSION',
+                publicActivity: 'PUBLIC ACTIVITY',
+                total: 'TOTAL',
+                lastSync: 'LAST SYNC',
+                toastSnapshot: 'Using the verified public snapshot. Connect a secure endpoint for one-minute sync.',
+                toastSuccess: 'Steam signal synchronized.',
+                toastFailure: 'Steam signal unavailable. Verified snapshot restored.'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('jasmin_language') === 'en' ? 'en' : 'zh';
+        let currentProfileData = null;
+        const t = (key) => I18N[currentLanguage][key] || key;
+
         const CONFIG = {
             steamId: '76561199836731858',
             profileUrl: 'https://steamcommunity.com/profiles/76561199836731858/',
             dataEndpoint: '',
-            refreshMs: 6 * 60 * 60 * 1000,
-            cacheKey: 'jasmin_steam_profile_v3'
+            refreshMs: 60 * 1000,
+            cacheKey: 'jasmin_steam_profile_v4'
         };
 
         const SNAPSHOT = {
@@ -520,6 +631,31 @@
             ]
         };
 
+        function setLanguage(language, rerender = true) {
+            currentLanguage = language === 'en' ? 'en' : 'zh';
+            try { localStorage.setItem('jasmin_language', currentLanguage); } catch (_) {}
+            document.documentElement.lang = currentLanguage === 'zh' ? 'zh-CN' : 'en';
+
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const key = element.getAttribute('data-i18n');
+                if (key && I18N[currentLanguage][key]) element.textContent = I18N[currentLanguage][key];
+            });
+
+            const heroTitle = document.getElementById('hero-title');
+            heroTitle.textContent = t('heroTitle');
+            heroTitle.setAttribute('data-text', t('heroTitle'));
+
+            ['zh', 'en'].forEach((code) => {
+                const button = document.getElementById(`lang-${code}`);
+                const active = code === currentLanguage;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', String(active));
+            });
+
+            document.getElementById('sfx-text').textContent = audioEnabled ? t('audioOn') : t('audioOff');
+            if (rerender && currentProfileData) renderProfile(currentProfileData);
+        }
+
         const gameImage = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${Number(appId)}/header.jpg`;
 
         function safeUrl(value, fallback = '') {
@@ -534,7 +670,7 @@
         function formatSyncTime(value) {
             const date = new Date(value);
             if (Number.isNaN(date.getTime())) return '--';
-            return new Intl.DateTimeFormat('zh-CN', {
+            return new Intl.DateTimeFormat(currentLanguage === 'zh' ? 'zh-CN' : 'en-GB', {
                 month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
             }).format(date);
         }
@@ -557,7 +693,7 @@
             if (!games.length) {
                 const empty = document.createElement('p');
                 empty.className = 'md:col-span-2 border border-slate-800 bg-black/40 p-6 text-slate-500 font-mono text-sm';
-                empty.textContent = 'NO PUBLIC MISSION DATA // 暂无公开游戏记录';
+                empty.textContent = t('noMissionData');
                 grid.appendChild(empty);
                 return;
             }
@@ -576,7 +712,7 @@
                 top.className = 'flex items-center justify-between gap-3';
                 const mission = document.createElement('span');
                 mission.className = 'font-mono text-[10px] tracking-[0.22em] text-cyan-300';
-                mission.textContent = `MISSION ${String(index + 1).padStart(2, '0')}`;
+                mission.textContent = `${t('mission')} ${String(index + 1).padStart(2, '0')}`;
                 const app = document.createElement('span');
                 app.className = 'font-mono text-[10px] text-slate-500';
                 app.textContent = Number.isFinite(appId) ? `APP // ${appId}` : 'APP // UNKNOWN';
@@ -585,13 +721,13 @@
                 const info = document.createElement('div');
                 const title = document.createElement('h3');
                 title.className = 'font-orbitron text-xl font-bold text-white leading-tight';
-                title.textContent = game.name || 'Unknown mission';
+                title.textContent = game.name || (currentLanguage === 'zh' ? '未知任务' : 'Unknown mission');
                 const hours = document.createElement('p');
                 hours.className = 'font-mono text-xs text-slate-300 mt-3';
                 const activity = Number(game.recentHours);
                 const total = Number(game.totalHours);
-                const activityText = Number.isFinite(activity) ? `PUBLIC ACTIVITY ${activity.toFixed(1)}H` : 'PUBLIC ACTIVITY --';
-                const totalText = Number.isFinite(total) ? `TOTAL ${total.toFixed(1)}H` : 'TOTAL --';
+                const activityText = Number.isFinite(activity) ? `${t('publicActivity')} ${activity.toFixed(1)}H` : `${t('publicActivity')} --`;
+                const totalText = Number.isFinite(total) ? `${t('total')} ${total.toFixed(1)}H` : `${t('total')} --`;
                 hours.textContent = `${activityText} // ${totalText}`;
                 info.append(title, hours);
                 card.append(top, info);
@@ -600,41 +736,42 @@
         }
 
         function renderProfile(data) {
+            currentProfileData = data;
             const games = Array.isArray(data.recentGames) ? data.recentGames : [];
             const sourceIsLive = data.source === 'steam';
             const status = String(data.status || 'offline').toLowerCase();
-            const statusLabel = String(data.statusLabel || status || 'UNKNOWN').toUpperCase();
+            const statusLabel = status === 'offline' ? t('offline') : t('online');
             const profileUrl = safeUrl(data.steamUrl, CONFIG.profileUrl);
             const avatar = safeUrl(data.avatarUrl, SNAPSHOT.avatarUrl);
 
             document.getElementById('profile-avatar').src = avatar;
             document.getElementById('profile-name').textContent = data.displayName || 'Jasmin';
             document.getElementById('profile-status').textContent = statusLabel;
-            document.getElementById('profile-source').textContent = sourceIsLive ? 'STEAM API // LIVE' : 'STEAM // VERIFIED SNAPSHOT';
+            document.getElementById('profile-source').textContent = sourceIsLive ? t('sourceLive') : t('sourceSnapshot');
             document.getElementById('steam-profile-link').href = profileUrl;
-            document.getElementById('stats-status').textContent = status === 'offline' ? 'OFFLINE' : 'ONLINE';
+            document.getElementById('stats-status').textContent = status === 'offline' ? t('offline') : t('online');
             document.getElementById('stats-games').textContent = String(games.length);
             document.getElementById('stats-hours').textContent = `${games.reduce((sum, game) => sum + (Number(game.totalHours) || 0), 0).toFixed(1)}H`;
-            document.getElementById('last-sync').textContent = `LAST SYNC: ${formatSyncTime(data.updatedAt)}`;
+            document.getElementById('last-sync').textContent = `${t('lastSync')}: ${formatSyncTime(data.updatedAt)}`;
             document.getElementById('system-status').textContent = sourceIsLive
-                ? 'STEAM UPLINK: LIVE // 6H CACHE'
-                : 'STEAM UPLINK: PUBLIC SNAPSHOT // READY';
+                ? t('systemLive')
+                : t('systemSnapshot');
             document.getElementById('recent-source-label').textContent = sourceIsLive
-                ? 'Steam Web API 数据已连接；页面按 6 小时缓存周期自动同步。'
-                : '已验证的 Steam 公开资料快照。连接安全数据接口后，每 6 小时自动同步。';
+                ? t('recentLive')
+                : t('recentSnapshot');
 
             setStatusTone(status);
             if (data.currentGame) {
-                document.getElementById('current-game-name').textContent = data.currentGame.name || 'ACTIVE MISSION';
+                document.getElementById('current-game-name').textContent = data.currentGame.name || t('activeMission');
                 const total = Number(data.currentGame.totalHours);
                 document.getElementById('current-game-detail').textContent = Number.isFinite(total)
-                    ? `NOW PLAYING // 累计 ${total.toFixed(1)} 小时`
-                    : 'NOW PLAYING // STEAM SIGNAL ACTIVE';
+                    ? t('nowPlayingHours').replace('{hours}', total.toFixed(1))
+                    : t('nowPlayingActive');
             } else {
-                document.getElementById('current-game-name').textContent = 'NO ACTIVE GAME';
+                document.getElementById('current-game-name').textContent = t('noActiveGame');
                 document.getElementById('current-game-detail').textContent = status === 'offline'
-                    ? 'Jasmin 当前处于离线状态。'
-                    : '在线待命，当前未进入游戏。';
+                    ? t('offlineDetail')
+                    : t('onlineIdle');
             }
             renderGameCards(games);
         }
@@ -678,7 +815,7 @@
 
             if (!CONFIG.dataEndpoint) {
                 renderProfile(SNAPSHOT);
-                if (force) showToast('当前使用公开资料快照；安全数据接口接入后可实时同步。');
+                if (force) showToast(t('toastSnapshot'));
                 return;
             }
 
@@ -690,11 +827,11 @@
                 if (!data || !Array.isArray(data.recentGames)) throw new Error('Invalid Steam payload');
                 saveCache(data);
                 renderProfile(data);
-                if (force) showToast('Steam signal synchronized.');
+                if (force) showToast(t('toastSuccess'));
             } catch (error) {
                 console.warn('Steam sync unavailable; using verified snapshot.', error);
                 renderProfile(readCache() || SNAPSHOT);
-                if (force) showToast('Steam 信号暂时不可用，已切换到资料快照。');
+                if (force) showToast(t('toastFailure'));
             } finally {
                 setSyncing(false);
             }
@@ -713,11 +850,11 @@
                 Tone.start();
                 synth = new Tone.Synth().toDestination();
                 icon.className = "fa-solid fa-volume-high text-cyan-400";
-                text.innerText = "AUDIO: ON";
+                text.innerText = t('audioOn');
                 playBeep(880);
             } else {
                 icon.className = "fa-solid fa-volume-xmark";
-                text.innerText = "AUDIO: OFF";
+                text.innerText = t('audioOff');
             }
         }
 
@@ -728,6 +865,7 @@
         }
 
         window.addEventListener('load', () => {
+            setLanguage(currentLanguage, false);
             refreshSteamProfile(false);
             window.setInterval(() => refreshSteamProfile(true), CONFIG.refreshMs);
         });
