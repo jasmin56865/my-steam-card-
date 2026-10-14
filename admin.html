@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>JASMIN // 状态控制台</title>
+  <style>
+    :root {
+      --bg: #05070c;
+      --panel: rgba(10, 14, 25, .88);
+      --panel-strong: #0b1020;
+      --line: rgba(96, 117, 151, .28);
+      --text: #edf7ff;
+      --muted: #8494ad;
+      --cyan: #39efff;
+      --cyan-soft: rgba(57, 239, 255, .12);
+      --pink: #ff3f81;
+      --pink-soft: rgba(255, 63, 129, .12);
+      --green: #5dffb2;
+      --red: #ff667d;
+      --yellow: #ffd166;
+      --radius: 18px;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .48);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(0, 221, 255, .12), transparent 29rem),
+        radial-gradient(circle at 88% 78%, rgba(255, 34, 124, .1), transparent 27rem),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        linear-gradient(rgba(78, 226, 255, .14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(78, 226, 255, .14) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+
+    button, input, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: inherit; }
+    [hidden] { display: none !important; }
+
+    :focus-visible {
+      outline: 2px solid var(--yellow);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 64px;
+      padding: 10px 0 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(57, 239, 255, .58);
+      border-radius: 12px 4px 12px 4px;
+      color: var(--cyan);
+      background: var(--cyan-soft);
+      box-shadow: inset 0 0 20px rgba(57, 239, 255, .08), 0 0 20px rgba(57, 239, 255, .12);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-weight: 900;
+      font-size: 19px;
+    }
+
+    .eyebrow, .mono {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand-title { margin: 0; font-size: 15px; letter-spacing: .11em; }
+    .brand-subtitle { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
+
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .connection-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #657086;
+      box-shadow: 0 0 0 4px rgba(101, 112, 134, .1);
+    }
+
+    .connection[data-state="online"] { color: var(--green); }
+    .connection[data-state="online"] .connection-dot { background: var(--green); box-shadow: 0 0 14px var(--green); }
+    .connection[data-state="busy"] { color: var(--yellow); }
+    .connection[data-state="busy"] .connection-dot { background: var(--yellow); box-shadow: 0 0 14px rgba(255, 209, 102, .65); }
+
+    .login-wrap {
+      display: grid;
+      place-items: center;
+      min-height: calc(100vh - 145px);
+      padding: 38px 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(14, 20, 35, .94), rgba(7, 10, 19, .9));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .login-card {
+      position: relative;
+      width: min(100%, 470px);
+      padding: clamp(26px, 6vw, 44px);
+      overflow: hidden;
+    }
+
+    .login-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 96px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--pink));
+      box-shadow: 0 0 18px var(--pink);
+    }
+
+    .login-icon {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      margin-bottom: 22px;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 63, 129, .5);
+      color: var(--pink);
+      background: var(--pink-soft);
+    }
+
+    h1, h2, h3, p { overflow-wrap: anywhere; }
+    h1 { margin: 0; font-size: clamp(28px, 7vw, 42px); line-height: 1.08; letter-spacing: -.04em; }
+    h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.025em; }
+    h3 { margin: 0; font-size: 17px; }
+
+    .lead { margin: 13px 0 28px; color: #a8b6ca; }
+    .security-note { margin: 15px 0 0; color: var(--muted); font-size: 12px; }
+
+    .field { display: grid; gap: 8px; }
+    .field + .field { margin-top: 16px; }
+    .label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    label, .field-label { color: #dce7f6; font-weight: 700; font-size: 13px; }
+    .optional { color: var(--muted); font-size: 11px; font-weight: 500; }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid rgba(120, 144, 178, .34);
+      border-radius: 11px;
+      color: var(--text);
+      background: rgba(2, 6, 14, .72);
+      padding: 12px 13px;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    input:hover, textarea:hover { border-color: rgba(120, 144, 178, .56); }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--cyan);
+      background: rgba(4, 11, 20, .94);
+      box-shadow: 0 0 0 3px rgba(57, 239, 255, .1);
+    }
+
+    input::placeholder, textarea::placeholder { color: #55647a; }
+    input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--red); }
+    textarea { min-height: 92px; resize: vertical; }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 70px; }
+    .text-button {
+      border: 0;
+      padding: 4px;
+      color: var(--cyan);
+      background: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .password-wrap .text-button { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 10px 3px 10px 3px;
+      padding: 10px 17px;
+      font-weight: 850;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, opacity .16s ease;
+    }
+
+    .button:hover:not(:disabled) { transform: translateY(-1px); }
+    .button:disabled { opacity: .5; cursor: not-allowed; }
+    .button-primary { color: #021014; background: var(--cyan); box-shadow: 0 0 24px rgba(57, 239, 255, .15); }
+    .button-primary:hover:not(:disabled) { background: #b9faff; }
+    .button-secondary { border-color: rgba(120, 144, 178, .36); background: rgba(13, 21, 36, .72); color: #c9d7e9; }
+    .button-secondary:hover:not(:disabled) { border-color: rgba(57, 239, 255, .55); color: white; }
+    .button-danger { border-color: rgba(255, 102, 125, .32); color: #ff9cac; background: rgba(255, 102, 125, .07); }
+    .login-submit { width: 100%; margin-top: 18px; }
+
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .message {
+      margin: 14px 0 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 102, 125, .34);
+      border-radius: 10px;
+      color: #ffadba;
+      background: rgba(255, 102, 125, .08);
+      font-size: 13px;
+    }
+
+    .editor { padding-top: 34px; }
+
+    .editor-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+
+    .editor-head p { margin: 7px 0 0; color: var(--muted); }
+    .head-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .form-stack { display: grid; gap: 18px; min-width: 0; }
+    .section { padding: clamp(20px, 4vw, 30px); }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-head p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .count { flex: 0 0 auto; color: var(--cyan); font-size: 12px; }
+
+    .status-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .status-choice { position: relative; }
+    .status-choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .status-choice label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 66px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(2, 6, 14, .55);
+      cursor: pointer;
+    }
+
+    .choice-dot { width: 12px; height: 12px; border-radius: 50%; background: #667286; }
+    .choice-copy { display: grid; gap: 2px; }
+    .choice-copy small { color: var(--muted); font-weight: 500; }
+    .status-choice input:focus-visible + label { outline: 2px solid var(--yellow); outline-offset: 3px; }
+    .status-choice input:checked + label { border-color: var(--cyan); background: var(--cyan-soft); box-shadow: inset 0 0 24px rgba(57, 239, 255, .05); }
+    .status-choice input:checked + label .choice-dot { background: var(--green); box-shadow: 0 0 14px var(--green); }
+    .status-choice.offline input:checked + label { border-color: rgba(255, 102, 125, .62); background: rgba(255, 102, 125, .08); }
+    .status-choice.offline input:checked + label .choice-dot { background: var(--red); box-shadow: 0 0 14px rgba(255, 102, 125, .78); }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(135px, .34fr);
+      gap: 15px;
+    }
+
+    .field-grid .wide { grid-column: 1 / -1; }
+    .field-help { margin: 0; color: var(--muted); font-size: 11px; }
+
+    .recent-list { display: grid; gap: 14px; }
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 120px;
+      border: 1px dashed rgba(120, 144, 178, .3);
+      border-radius: 13px;
+      color: var(--muted);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .game-row {
+      position: relative;
+      padding: 18px;
+      border: 1px solid rgba(120, 144, 178, .25);
+      border-radius: 14px;
+      background: rgba(3, 7, 15, .55);
+    }
+
+    .game-row-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .game-index { color: var(--pink); font-size: 12px; }
+    .row-actions { display: flex; gap: 4px; }
+    .icon-button {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: #8fa0b8;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .icon-button:hover:not(:disabled) { border-color: var(--line); color: var(--cyan); background: rgba(57, 239, 255, .07); }
+    .icon-button.remove:hover:not(:disabled) { color: var(--red); background: rgba(255, 102, 125, .08); }
+    .icon-button:disabled { opacity: .28; cursor: not-allowed; }
+
+    .add-row { margin-top: 15px; width: 100%; border-style: dashed; }
+
+    .save-bar {
+      position: sticky;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 13px;
+      border: 1px solid rgba(57, 239, 255, .26);
+      border-radius: 14px;
+      background: rgba(7, 12, 22, .9);
+      box-shadow: 0 14px 45px rgba(0, 0, 0, .42);
+      backdrop-filter: blur(18px);
+    }
+
+    .save-state { color: var(--muted); font-size: 12px; }
+    .save-state[data-dirty="true"] { color: var(--yellow); }
+
+    .preview { position: sticky; top: 20px; overflow: hidden; }
+    .preview-topline { height: 3px; background: linear-gradient(90deg, var(--cyan), var(--pink)); }
+    .preview-body { padding: 25px; }
+    .preview-label { margin: 0 0 18px; color: var(--muted); font-size: 11px; }
+    .preview-status { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .preview-status-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--red); box-shadow: 0 0 16px rgba(255, 102, 125, .72); }
+    .preview-status[data-status="online"] .preview-status-dot { background: var(--green); box-shadow: 0 0 16px var(--green); }
+    .preview-status strong { font-size: 19px; letter-spacing: .08em; }
+    .preview-game {
+      padding: 17px;
+      border: 1px solid rgba(255, 63, 129, .28);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 63, 129, .08), rgba(57, 239, 255, .035));
+    }
+    .preview-game small { color: var(--pink); }
+    .preview-game h3 { margin-top: 7px; }
+    .preview-game p { margin: 7px 0 0; color: #aab8ca; font-size: 13px; white-space: pre-wrap; }
+    .preview-recent { margin-top: 23px; }
+    .preview-recent h3 { margin-bottom: 10px; font-size: 13px; color: #d8e4f4; }
+    .preview-recent ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .preview-recent li { display: flex; gap: 10px; color: #aebcd0; font-size: 13px; }
+    .preview-recent li span:first-child { color: var(--cyan); font-family: monospace; }
+    .preview-time { margin: 21px 0 0; padding-top: 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+
+    .toast {
+      position: fixed;
+      z-index: 20;
+      left: 50%;
+      bottom: 28px;
+      width: min(430px, calc(100% - 32px));
+      transform: translate(-50%, 18px);
+      padding: 13px 16px;
+      border: 1px solid rgba(93, 255, 178, .38);
+      border-radius: 11px;
+      color: #bdffdc;
+      background: rgba(7, 24, 20, .96);
+      box-shadow: 0 15px 55px rgba(0, 0, 0, .5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { color: #ffd2d9; border-color: rgba(255, 102, 125, .42); background: rgba(31, 9, 16, .96); }
+
+    @media (max-width: 880px) {
+      .editor-grid { grid-template-columns: 1fr; }
+      .preview { position: static; grid-row: 1; }
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 22px, 1180px); padding-top: 12px; }
+      .topbar { align-items: flex-start; }
+      .brand-subtitle { display: none; }
+      .connection span:last-child { display: none; }
+      .editor-head { display: grid; align-items: start; }
+      .head-actions { justify-content: stretch; }
+      .head-actions .button { flex: 1; }
+      .status-options, .field-grid { grid-template-columns: 1fr; }
+      .field-grid .wide { grid-column: auto; }
+      .section-head { display: grid; }
+      .save-bar { align-items: stretch; flex-direction: column; }
+      .save-bar .button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">J</div>
+        <div>
+          <h2 class="brand-title mono">JASMIN // CONTROL DECK</h2>
+          <p class="brand-subtitle mono">PRIVATE MANUAL STATUS CHANNEL</p>
+        </div>
+      </div>
+      <div id="connection" class="connection mono" data-state="idle" aria-live="polite">
+        <span class="connection-dot" aria-hidden="true"></span>
+        <span id="connection-text">等待身份验证</span>
+      </div>
+    </header>
+
+    <main>
+      <section id="login-view" class="login-wrap" aria-labelledby="login-title">
+        <div class="card login-card">
+          <div class="login-icon" aria-hidden="true">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+              <path d="M12 14v3"></path>
+            </svg>
+          </div>
+          <p class="eyebrow" style="color: var(--pink); font-size: 11px; margin: 0 0 10px;">RESTRICTED ACCESS</p>
+          <h1 id="login-title">管理员登录</h1>
+          <p class="lead">输入管理密码，连接你的私人状态数据接口。</p>
+
+          <form id="login-form" novalidate>
+            <div class="field">
+              <label for="password">管理密码</label>
+              <div class="password-wrap">
+                <input id="password" name="password" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="256" placeholder="输入密码" aria-describedby="password-note login-error">
+                <button id="toggle-password" class="text-button" type="button" aria-label="显示密码" aria-pressed="false">显示</button>
+              </div>
+            </div>
+            <button id="login-button" class="button button-primary login-submit" type="submit">
+              <span id="login-spinner" class="spinner" hidden aria-hidden="true"></span>
+              <span id="login-button-text">验证并进入</span>
+            </button>
+            <p id="login-error" class="message" role="alert" hidden></p>
+            <p id="password-note" class="security-note">此页面只在当前会话内存中使用密码，不会把密码写入网页、URL 或本地存储。</p>
+          </form>
+        </div>
+      </section>
+
+      <section id="editor-view" class="editor" aria-labelledby="editor-title" hidden>
+        <div class="editor-head">
+          <div>
+            <p class="eyebrow" style="color: var(--cyan); font-size: 11px; margin: 0 0 8px;">MANUAL SIGNAL EDITOR</p>
+            <h1 id="editor-title">更新公开状态</h1>
+            <p>保存后，公共网页将在下一次同步时读取这些信息。</p>
+          </div>
+          <div class="head-actions">
+            <a class="button button-secondary" href="./index.html" target="_blank" rel="noopener">查看公共网页 ↗</a>
+            <button id="logout-button" class="button button-danger" type="button">安全退出</button>
+          </div>
+        </div>
+
+        <div class="editor-grid">
+          <form id="status-form" class="form-stack" novalidate>
+            <section class="card section" aria-labelledby="status-heading">
+              <div class="section-head">
+                <div>
+                  <h2 id="status-heading">当前状态</h2>
+                  <p>选择访客现在看到的在线信号。</p>
+                </div>
+                <span class="count mono">01 // SIGNAL</span>
+              </div>
+              <div class="status-options">
+                <div class="status-choice">
+                  <input id="status-online" name="status" type="radio" value="online">
+                  <label for="status-online">
+                    <span class="choice-dot" aria-hidden="true"></span>
+                    <span class="choice-copy"><strong>在线</strong><small>AVAILABLE // ONLINE</small></span>
+                  </label>
+                </div>
+                <div class="status-choice offline">
+                  <input id="status-offline" name="status" type="radio" value="offline" checked>
+                  <label for="status-offline">
+                    <span class="choice-dot" aria-hidden="true"></span>
+                    <span class="choice-copy"><strong>离线</strong><small>DISCONNECTED // OFFLINE</small></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section class="card section" aria-labelledby="current-heading">
+              <div class="section-head">
+                <div>
+                  <h2 id="current-heading">当前玩的游戏</h2>
+                  <p>没有正在玩的游戏时，所有字段留空即可。</p>
+                </div>
+                <span class="count mono">02 // ACTIVE</span>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <div class="label-row"><label for="current-name">游戏名称</label><span class="optional">选填</span></div>
+                  <input id="current-name" name="currentName" type="text" maxlength="100" placeholder="例如：Civilization VI">
+                </div>
+                <div class="field">
+                  <div class="label-row"><label for="current-hours">游戏时长</label><span class="optional">小时</span></div>
+                  <input id="current-hours" name="currentHours" type="number" inputmode="decimal" min="0" max="999999" step="0.1" placeholder="43.0">
+                </div>
+                <div class="field wide">
+                  <div class="label-row"><label for="current-url">Steam 商店链接</label><span class="optional">选填</span></div>
+                  <input id="current-url" name="currentUrl" type="url" inputmode="url" maxlength="500" placeholder="https://store.steampowered.com/app/289070/...">
+                  <p class="field-help">请使用 store.steampowered.com 的游戏页面链接。</p>
+                </div>
+                <div class="field wide">
+                  <div class="label-row"><label for="current-note">备注</label><span id="current-note-count" class="optional">0 / 280</span></div>
+                  <textarea id="current-note" name="currentNote" maxlength="280" placeholder="例如：今晚继续下一回合……"></textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="card section" aria-labelledby="recent-heading">
+              <div class="section-head">
+                <div>
+                  <h2 id="recent-heading">最近玩过的游戏</h2>
+                  <p>最多 6 个；可使用箭头调整公开展示顺序。</p>
+                </div>
+                <span id="recent-count" class="count mono">0 / 6</span>
+              </div>
+              <div id="recent-list" class="recent-list"></div>
+              <button id="add-game-button" class="button button-secondary add-row" type="button">＋ 添加最近游戏</button>
+            </section>
+
+            <div class="save-bar">
+              <span id="save-state" class="save-state" data-dirty="false" aria-live="polite">所有变更均已保存</span>
+              <button id="save-button" class="button button-primary" type="submit">
+                <span id="save-spinner" class="spinner" hidden aria-hidden="true"></span>
+                <span id="save-button-text">保存并发布状态</span>
+              </button>
+            </div>
+          </form>
+
+          <aside class="card preview" aria-labelledby="preview-title">
+            <div class="preview-topline"></div>
+            <div class="preview-body">
+              <p id="preview-title" class="preview-label mono">PUBLIC SIGNAL // 实时预览</p>
+              <div id="preview-status" class="preview-status" data-status="offline">
+                <span class="preview-status-dot" aria-hidden="true"></span>
+                <strong id="preview-status-text">OFFLINE</strong>
+              </div>
+              <div class="preview-game">
+                <small class="mono">CURRENT MISSION</small>
+                <h3 id="preview-game-name">暂无进行中的游戏</h3>
+                <p id="preview-game-meta">当前未填写游戏信息。</p>
+                <p id="preview-game-note" hidden></p>
+              </div>
+              <div class="preview-recent">
+                <h3 class="mono">RECENT MISSIONS</h3>
+                <ol id="preview-recent-list"><li><span>--</span><span>暂无最近游戏</span></li></ol>
+              </div>
+              <p id="preview-time" class="preview-time mono">LAST SAVED // --</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const API_URL = 'https://jasmin-game-archive.spicyeagle8.chatgpt.site/api/admin/status';
+      const MAX_RECENT_GAMES = 6;
+      let authToken = '';
+      let dirty = false;
+      let busy = false;
+      let toastTimer = 0;
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const loginView = $('#login-view');
+      const editorView = $('#editor-view');
+      const loginForm = $('#login-form');
+      const statusForm = $('#status-form');
+      const passwordInput = $('#password');
+      const loginError = $('#login-error');
+      const recentList = $('#recent-list');
+
+      function setConnection(state, text) {
+        const element = $('#connection');
+        element.dataset.state = state;
+        $('#connection-text').textContent = text;
+      }
+
+      function setButtonBusy(button, spinner, textNode, active, activeText, idleText) {
+        button.disabled = active;
+        spinner.hidden = !active;
+        textNode.textContent = active ? activeText : idleText;
+      }
+
+      function showToast(message, type = 'success') {
+        const toast = $('#toast');
+        window.clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.toggle('error', type === 'error');
+        toast.classList.add('visible');
+        toastTimer = window.setTimeout(() => toast.classList.remove('visible'), 3600);
+      }
+
+      function getErrorMessage(status, fallback) {
+        if (status === 401 || status === 403) return '密码不正确，或管理员访问尚未配置。';
+        if (status === 404) return '管理接口尚未部署，请检查网站后端。';
+        if (status === 429) return '尝试次数过多，请稍后再试。';
+        if (status >= 500) return '服务器暂时不可用，请稍后重试。';
+        return fallback || `请求失败（${status}）`;
+      }
+
+      async function apiRequest(method, body) {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 12000);
+        try {
+          const response = await fetch(API_URL, {
+            method,
+            mode: 'cors',
+            credentials: 'omit',
+            cache: 'no-store',
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${authToken}`,
+              ...(body ? { 'Content-Type': 'application/json' } : {})
+            },
+            ...(body ? { body: JSON.stringify(body) } : {})
+          });
+
+          let payload = null;
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            try { payload = await response.json(); } catch (_) {}
+          }
+
+          if (!response.ok) {
+            const detail = payload && typeof payload.error === 'string' ? payload.error : '';
+            throw Object.assign(new Error(getErrorMessage(response.status, detail)), { status: response.status });
+          }
+          return payload;
+        } catch (error) {
+          if (error && error.name === 'AbortError') throw new Error('连接超时，请检查网络后重试。');
+          if (error instanceof TypeError) throw new Error('无法连接状态接口。请检查网络或接口的 CORS 设置。');
+          throw error;
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }
+
+      function unwrapState(payload) {
+        if (!payload || typeof payload !== 'object') return {};
+        if (payload.state && typeof payload.state === 'object') return payload.state;
+        if (payload.data && typeof payload.data === 'object') return payload.data;
+        return payload;
+      }
+
+      function cleanString(value, maxLength) {
+        return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
+      }
+
+      function readHours(value) {
+        if (value === '' || value === null || typeof value === 'undefined') return '';
+        const number = Number(value);
+        return Number.isFinite(number) && number >= 0 ? String(Math.min(number, 999999)) : '';
+      }
+
+      function normalizeState(raw) {
+        const recent = Array.isArray(raw.recentGames) ? raw.recentGames.slice(0, MAX_RECENT_GAMES) : [];
+        const current = raw.currentGame && typeof raw.currentGame === 'object' ? raw.currentGame : null;
+        return {
+          status: String(raw.status).toLowerCase() === 'online' ? 'online' : 'offline',
+          currentGame: current ? {
+            name: cleanString(current.name, 100),
+            storeUrl: cleanString(current.storeUrl || current.url, 500),
+            totalHours: readHours(current.totalHours ?? current.hours),
+            note: cleanString(current.note, 280)
+          } : null,
+          recentGames: recent.map((game) => ({
+            name: cleanString(game && game.name, 100),
+            storeUrl: cleanString(game && (game.storeUrl || game.url), 500),
+            totalHours: readHours(game && (game.totalHours ?? game.hours)),
+            note: cleanString(game && game.note, 180)
+          })),
+          updatedAt: raw.updatedAt || raw.savedAt || ''
+        };
+      }
+
+      function createRecentRow(game = {}) {
+        if (recentList.querySelectorAll('.game-row').length >= MAX_RECENT_GAMES) return;
+        const empty = $('#recent-empty');
+        if (empty) empty.remove();
+
+        const row = document.createElement('div');
+        row.className = 'game-row';
+        row.innerHTML = `
+          <div class="game-row-head">
+            <strong class="game-index mono">MISSION 01</strong>
+            <div class="row-actions">
+              <button class="icon-button move-up" type="button" aria-label="向上移动" title="向上移动">↑</button>
+              <button class="icon-button move-down" type="button" aria-label="向下移动" title="向下移动">↓</button>
+              <button class="icon-button remove" type="button" aria-label="删除这款游戏" title="删除">×</button>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="label-row"><label>游戏名称</label><span class="optional">必填</span></div>
+              <input class="recent-name" type="text" maxlength="100" placeholder="游戏名称" required>
+            </div>
+            <div class="field">
+              <div class="label-row"><label>游戏时长</label><span class="optional">小时</span></div>
+              <input class="recent-hours" type="number" inputmode="decimal" min="0" max="999999" step="0.1" placeholder="0.0">
+            </div>
+            <div class="field wide">
+              <div class="label-row"><label>Steam 商店链接</label><span class="optional">选填</span></div>
+              <input class="recent-url" type="url" inputmode="url" maxlength="500" placeholder="https://store.steampowered.com/app/...">
+            </div>
+            <div class="field wide">
+              <div class="label-row"><label>备注</label><span class="optional recent-note-count">0 / 180</span></div>
+              <textarea class="recent-note" maxlength="180" placeholder="最近的游玩记录或一句话备注"></textarea>
+            </div>
+          </div>`;
+
+        $('.recent-name', row).value = cleanString(game.name, 100);
+        $('.recent-hours', row).value = readHours(game.totalHours ?? game.hours);
+        $('.recent-url', row).value = cleanString(game.storeUrl || game.url, 500);
+        $('.recent-note', row).value = cleanString(game.note, 180);
+
+        $('.move-up', row).addEventListener('click', () => moveRow(row, -1));
+        $('.move-down', row).addEventListener('click', () => moveRow(row, 1));
+        $('.remove', row).addEventListener('click', () => {
+          row.remove();
+          updateRows();
+          markDirty();
+          updatePreview();
+        });
+        row.addEventListener('input', () => updateRowNoteCount(row));
+        recentList.appendChild(row);
+        updateRowNoteCount(row);
+        updateRows();
+      }
+
+      function moveRow(row, direction) {
+        const sibling = direction < 0 ? row.previousElementSibling : row.nextElementSibling;
+        if (!sibling) return;
+        if (direction < 0) recentList.insertBefore(row, sibling);
+        else recentList.insertBefore(sibling, row);
+        updateRows();
+        markDirty();
+        updatePreview();
+        row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+
+      function updateRowNoteCount(row) {
+        const note = $('.recent-note', row);
+        $('.recent-note-count', row).textContent = `${note.value.length} / 180`;
+      }
+
+      function updateRows() {
+        const rows = [...recentList.querySelectorAll('.game-row')];
+        rows.forEach((row, index) => {
+          $('.game-index', row).textContent = `MISSION ${String(index + 1).padStart(2, '0')}`;
+          $('.move-up', row).disabled = index === 0;
+          $('.move-down', row).disabled = index === rows.length - 1;
+          const labelPrefix = `最近游戏 ${index + 1}`;
+          $('.recent-name', row).setAttribute('aria-label', `${labelPrefix}名称`);
+          $('.recent-hours', row).setAttribute('aria-label', `${labelPrefix}时长`);
+          $('.recent-url', row).setAttribute('aria-label', `${labelPrefix} Steam 商店链接`);
+          $('.recent-note', row).setAttribute('aria-label', `${labelPrefix}备注`);
+        });
+        $('#recent-count').textContent = `${rows.length} / ${MAX_RECENT_GAMES}`;
+        $('#add-game-button').disabled = rows.length >= MAX_RECENT_GAMES;
+        ensureEmptyState(rows.length === 0);
+      }
+
+      function ensureEmptyState(show) {
+        let empty = $('#recent-empty');
+        if (show && !empty) {
+          empty = document.createElement('div');
+          empty.id = 'recent-empty';
+          empty.className = 'empty-state';
+          empty.innerHTML = '<span><strong>还没有最近游戏</strong><br><small>点击下方按钮添加第一款游戏</small></span>';
+          recentList.appendChild(empty);
+        } else if (!show && empty) {
+          empty.remove();
+        }
+      }
+
+      function fillForm(rawState) {
+        const state = normalizeState(rawState);
+        $(`#status-${state.status}`).checked = true;
+        $('#current-name').value = state.currentGame ? state.currentGame.name : '';
+        $('#current-hours').value = state.currentGame ? state.currentGame.totalHours : '';
+        $('#current-url').value = state.currentGame ? state.currentGame.storeUrl : '';
+        $('#current-note').value = state.currentGame ? state.currentGame.note : '';
+        recentList.replaceChildren();
+        state.recentGames.forEach(createRecentRow);
+        updateRows();
+        updateNoteCount();
+        updatePreview();
+        updateSavedTime(state.updatedAt);
+        clearValidation();
+        setDirty(false);
+      }
+
+      function updateNoteCount() {
+        $('#current-note-count').textContent = `${$('#current-note').value.length} / 280`;
+      }
+
+      function setDirty(value) {
+        dirty = value;
+        const state = $('#save-state');
+        state.dataset.dirty = String(value);
+        state.textContent = value ? '有尚未保存的变更' : '所有变更均已保存';
+      }
+
+      function markDirty() {
+        if (!busy) setDirty(true);
+      }
+
+      function normalizeSteamUrl(value, fieldName) {
+        const trimmed = value.trim();
+        if (!trimmed) return '';
+        let url;
+        try { url = new URL(trimmed); } catch (_) { throw new Error(`${fieldName}不是有效链接。`); }
+        if (!['http:', 'https:'].includes(url.protocol)) throw new Error(`${fieldName}必须是网页链接。`);
+        if (url.hostname.toLowerCase() !== 'store.steampowered.com') throw new Error(`${fieldName}必须来自 store.steampowered.com。`);
+        if (!/^\/app\/\d+(?:\/|$)/i.test(url.pathname)) throw new Error(`${fieldName}必须指向具体的 Steam 游戏页面。`);
+        url.protocol = 'https:';
+        url.username = '';
+        url.password = '';
+        url.hash = '';
+        return url.toString();
+      }
+
+      function parseOptionalHours(input, fieldName) {
+        const value = input.value.trim();
+        if (!value) return null;
+        const number = Number(value);
+        if (!Number.isFinite(number) || number < 0 || number > 999999) {
+          input.setAttribute('aria-invalid', 'true');
+          throw new Error(`${fieldName}需要是 0 到 999999 之间的数字。`);
+        }
+        return Math.round(number * 10) / 10;
+      }
+
+      function readForm() {
+        clearValidation();
+        const status = $('input[name="status"]:checked')?.value || 'offline';
+        const currentName = $('#current-name').value.trim();
+        const currentUrlValue = $('#current-url').value.trim();
+        const currentNote = $('#current-note').value.trim();
+        const currentHoursValue = $('#current-hours').value.trim();
+        const hasCurrentDetails = currentUrlValue || currentNote || currentHoursValue;
+
+        if (!currentName && hasCurrentDetails) {
+          $('#current-name').setAttribute('aria-invalid', 'true');
+          $('#current-name').focus();
+          throw new Error('填写当前游戏的链接、时长或备注时，也需要填写游戏名称。');
+        }
+
+        let currentGame = null;
+        if (currentName) {
+          currentGame = {
+            name: currentName,
+            storeUrl: normalizeSteamUrl(currentUrlValue, '当前游戏链接'),
+            hours: parseOptionalHours($('#current-hours'), '当前游戏时长'),
+            note: currentNote
+          };
+        }
+
+        const recentGames = [...recentList.querySelectorAll('.game-row')].map((row, index) => {
+          const nameInput = $('.recent-name', row);
+          const urlInput = $('.recent-url', row);
+          const name = nameInput.value.trim();
+          if (!name) {
+            nameInput.setAttribute('aria-invalid', 'true');
+            nameInput.focus();
+            throw new Error(`请填写最近游戏 ${index + 1} 的名称，或删除这一项。`);
+          }
+          let storeUrl = '';
+          try { storeUrl = normalizeSteamUrl(urlInput.value, `最近游戏 ${index + 1} 的链接`); }
+          catch (error) {
+            urlInput.setAttribute('aria-invalid', 'true');
+            urlInput.focus();
+            throw error;
+          }
+          return {
+            name,
+            storeUrl,
+            hours: parseOptionalHours($('.recent-hours', row), `最近游戏 ${index + 1} 的时长`),
+            note: $('.recent-note', row).value.trim()
+          };
+        });
+
+        return {
+          status,
+          currentGame,
+          recentGames
+        };
+      }
+
+      function clearValidation() {
+        statusForm.querySelectorAll('[aria-invalid="true"]').forEach((field) => field.removeAttribute('aria-invalid'));
+      }
+
+      function readPreviewState() {
+        return {
+          status: $('input[name="status"]:checked')?.value || 'offline',
+          currentName: $('#current-name').value.trim(),
+          currentHours: $('#current-hours').value.trim(),
+          currentNote: $('#current-note').value.trim(),
+          recentNames: [...recentList.querySelectorAll('.recent-name')].map((input) => input.value.trim()).filter(Boolean)
+        };
+      }
+
+      function updatePreview() {
+        const state = readPreviewState();
+        const previewStatus = $('#preview-status');
+        previewStatus.dataset.status = state.status;
+        $('#preview-status-text').textContent = state.status === 'online' ? 'ONLINE' : 'OFFLINE';
+        $('#preview-game-name').textContent = state.currentName || '暂无进行中的游戏';
+        $('#preview-game-meta').textContent = state.currentName
+          ? (state.currentHours ? `累计 ${Number(state.currentHours).toLocaleString('zh-CN')} 小时` : '已填写当前游戏')
+          : '当前未填写游戏信息。';
+        const note = $('#preview-game-note');
+        note.textContent = state.currentNote;
+        note.hidden = !state.currentNote;
+
+        const list = $('#preview-recent-list');
+        list.replaceChildren();
+        if (!state.recentNames.length) {
+          const item = document.createElement('li');
+          const number = document.createElement('span');
+          const name = document.createElement('span');
+          number.textContent = '--';
+          name.textContent = '暂无最近游戏';
+          item.append(number, name);
+          list.appendChild(item);
+        } else {
+          state.recentNames.forEach((gameName, index) => {
+            const item = document.createElement('li');
+            const number = document.createElement('span');
+            const name = document.createElement('span');
+            number.textContent = String(index + 1).padStart(2, '0');
+            name.textContent = gameName;
+            item.append(number, name);
+            list.appendChild(item);
+          });
+        }
+      }
+
+      function updateSavedTime(value) {
+        const date = new Date(value);
+        $('#preview-time').textContent = Number.isNaN(date.getTime())
+          ? 'LAST SAVED // --'
+          : `LAST SAVED // ${new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short', hour12: false }).format(date)}`;
+      }
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        loginError.hidden = true;
+        const password = passwordInput.value;
+        if (!password) {
+          loginError.textContent = '请输入管理密码。';
+          loginError.hidden = false;
+          passwordInput.focus();
+          return;
+        }
+
+        authToken = password;
+        busy = true;
+        setConnection('busy', '正在验证');
+        setButtonBusy($('#login-button'), $('#login-spinner'), $('#login-button-text'), true, '正在连接…', '验证并进入');
+        try {
+          const payload = await apiRequest('GET');
+          fillForm(unwrapState(payload));
+          passwordInput.value = '';
+          loginView.hidden = true;
+          editorView.hidden = false;
+          setConnection('online', '管理员已连接');
+          $('#editor-title').focus?.();
+        } catch (error) {
+          authToken = '';
+          loginError.textContent = error.message || '登录失败，请重试。';
+          loginError.hidden = false;
+          setConnection('idle', '身份验证失败');
+          passwordInput.select();
+        } finally {
+          busy = false;
+          setButtonBusy($('#login-button'), $('#login-spinner'), $('#login-button-text'), false, '正在连接…', '验证并进入');
+        }
+      });
+
+      statusForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (busy || !authToken) return;
+        let nextState;
+        try { nextState = readForm(); }
+        catch (error) {
+          showToast(error.message, 'error');
+          return;
+        }
+
+        busy = true;
+        setConnection('busy', '正在保存');
+        setButtonBusy($('#save-button'), $('#save-spinner'), $('#save-button-text'), true, '正在发布…', '保存并发布状态');
+        try {
+          const payload = await apiRequest('PUT', nextState);
+          const returned = unwrapState(payload);
+          const saved = returned && (returned.status || returned.updatedAt || returned.currentGame || returned.recentGames)
+            ? returned
+            : nextState;
+          fillForm(saved);
+          updateSavedTime(saved.updatedAt || nextState.updatedAt);
+          showToast('状态已保存，公共网页将在下一次同步时更新。');
+          setConnection('online', '状态已同步');
+        } catch (error) {
+          if (error.status === 401 || error.status === 403) {
+            showToast('登录已失效，请重新登录。', 'error');
+            performLogout(false);
+          } else {
+            showToast(error.message || '保存失败，请重试。', 'error');
+            setConnection('idle', '保存失败');
+          }
+        } finally {
+          busy = false;
+          setButtonBusy($('#save-button'), $('#save-spinner'), $('#save-button-text'), false, '正在发布…', '保存并发布状态');
+        }
+      });
+
+      function performLogout(checkDirty = true) {
+        if (checkDirty && dirty && !window.confirm('尚有未保存的变更，确定要退出吗？')) return;
+        authToken = '';
+        dirty = false;
+        recentList.replaceChildren();
+        statusForm.reset();
+        editorView.hidden = true;
+        loginView.hidden = false;
+        passwordInput.value = '';
+        loginError.hidden = true;
+        setConnection('idle', '等待身份验证');
+        window.setTimeout(() => passwordInput.focus(), 0);
+      }
+
+      $('#logout-button').addEventListener('click', () => performLogout(true));
+      $('#add-game-button').addEventListener('click', () => {
+        createRecentRow();
+        markDirty();
+        updatePreview();
+        const newest = recentList.querySelector('.game-row:last-of-type .recent-name');
+        if (newest) newest.focus();
+      });
+
+      statusForm.addEventListener('input', (event) => {
+        if (event.target === $('#current-note')) updateNoteCount();
+        markDirty();
+        updatePreview();
+      });
+      statusForm.addEventListener('change', () => { markDirty(); updatePreview(); });
+
+      $('#toggle-password').addEventListener('click', () => {
+        const show = passwordInput.type === 'password';
+        passwordInput.type = show ? 'text' : 'password';
+        $('#toggle-password').textContent = show ? '隐藏' : '显示';
+        $('#toggle-password').setAttribute('aria-label', show ? '隐藏密码' : '显示密码');
+        $('#toggle-password').setAttribute('aria-pressed', String(show));
+        passwordInput.focus();
+      });
+
+      window.addEventListener('beforeunload', (event) => {
+        if (!dirty) return;
+        event.preventDefault();
+        event.returnValue = '';
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          passwordInput.type = 'password';
+          $('#toggle-password').textContent = '显示';
+          $('#toggle-password').setAttribute('aria-label', '显示密码');
+          $('#toggle-password').setAttribute('aria-pressed', 'false');
+        }
+      });
+
+      updateRows();
+      updateNoteCount();
+      updatePreview();
+    })();
+  </script>
+</body>
+</html>
