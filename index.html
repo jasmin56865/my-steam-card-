@@ -247,7 +247,7 @@
                 <h1 class="font-orbitron text-lg tracking-widest text-white font-black leading-none flex items-center gap-2">
                     JASMIN <span class="text-xs px-2 py-0.5 rounded bg-pink-500/20 text-pink-400 border border-pink-500/40">GM-99</span>
                 </h1>
-                <p id="system-status" class="text-[10px] text-cyan-400/80 font-mono tracking-wider">STEAM UPLINK: INITIALIZING...</p>
+                <p id="system-status" class="text-[10px] text-cyan-400/80 font-mono tracking-wider">STATUS LINK: INITIALIZING...</p>
             </div>
         </div>
 
@@ -257,9 +257,9 @@
                 <i class="fa-solid fa-volume-xmark" id="sfx-icon"></i>
                 <span id="sfx-text" class="hidden sm:inline" data-i18n="audioOff">音效：关</span>
             </button>
-            <button id="refresh-btn" onclick="refreshSteamProfile(true)" class="cyber-btn bg-pink-950/50 border border-pink-500/50 hover:border-pink-400 text-pink-400 hover:text-white px-3 py-1.5 md:px-4 md:py-2 text-xs font-mono flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(255,0,85,0.2)]">
+            <button id="refresh-btn" onclick="refreshManualStatus(true)" class="cyber-btn bg-pink-950/50 border border-pink-500/50 hover:border-pink-400 text-pink-400 hover:text-white px-3 py-1.5 md:px-4 md:py-2 text-xs font-mono flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(255,0,85,0.2)]">
                 <i id="refresh-icon" class="fa-solid fa-rotate"></i>
-                <span class="hidden sm:inline" data-i18n="syncSteam">同步 STEAM</span>
+                <span class="hidden sm:inline" data-i18n="syncStatus">刷新状态</span>
             </button>
         </div>
     </header>
@@ -331,7 +331,7 @@
                     </div>
                     <div class="min-w-0">
                         <div class="flex flex-wrap justify-center sm:justify-start items-center gap-2 mb-2">
-                            <span id="profile-source" class="px-2 py-1 border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-[10px] font-mono tracking-widest">PUBLIC SNAPSHOT</span>
+                            <span id="profile-source" class="px-2 py-1 border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-[10px] font-mono tracking-widest">MANUAL STATUS</span>
                             <span id="profile-status" class="px-2 py-1 border border-amber-500/50 bg-amber-950/50 text-amber-300 text-[10px] font-mono tracking-widest">同步中</span>
                         </div>
                         <h2 id="profile-name" class="font-orbitron text-3xl md:text-5xl font-black text-white tracking-tight">Jasmin</h2>
@@ -353,10 +353,14 @@
                         <span class="font-orbitron text-sm text-pink-300 tracking-widest" data-i18n="activeMission">当前任务</span>
                         <span class="text-[10px] font-mono text-slate-500" data-i18n="realtimeSlot">实时状态槽</span>
                     </div>
-                    <p id="current-game-name" class="font-orbitron text-xl md:text-2xl font-bold text-white">NO ACTIVE GAME</p>
+                    <a id="current-game-link" class="inline-flex items-center gap-2 font-orbitron text-xl md:text-2xl font-bold text-white transition-colors" aria-disabled="true">
+                        <span id="current-game-name">NO ACTIVE GAME</span>
+                        <i id="current-game-link-icon" class="fa-solid fa-arrow-up-right-from-square text-xs text-cyan-400 hidden" aria-hidden="true"></i>
+                    </a>
                     <p id="current-game-detail" class="text-sm text-slate-400 mt-2">Jasmin 当前处于离线状态。</p>
+                    <p id="current-game-note" class="text-sm text-cyan-200/80 mt-2 whitespace-pre-line hidden"></p>
                     <div class="mt-5 pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-mono text-slate-500">
-                        <span id="refresh-cycle" data-i18n="refreshCycle">REFRESH CYCLE: 01:00:00</span>
+                        <span id="refresh-cycle" data-i18n="refreshCycle">REFRESH CYCLE: 00:01:00</span>
                         <span id="last-sync">LAST SYNC: --</span>
                     </div>
                 </div>
@@ -367,18 +371,18 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 my-6">
             <div class="cyber-card cyber-cut p-4 border border-cyan-500/30 text-center relative overflow-hidden">
                 <div id="stats-status" class="text-xl md:text-3xl font-orbitron font-bold text-cyan-400">OFFLINE</div>
-                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="steamStatus">STEAM 状态</div>
+                <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="presenceStatus">我的状态</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-pink-500/30 text-center relative overflow-hidden">
-                <div id="stats-games" class="text-2xl md:text-4xl font-orbitron font-bold text-pink-500">6</div>
+                <div id="stats-games" class="text-2xl md:text-4xl font-orbitron font-bold text-pink-500">0</div>
                 <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="publicSignals">公开游戏信号</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-purple-500/30 text-center relative overflow-hidden">
-                <div id="stats-hours" class="text-2xl md:text-4xl font-orbitron font-bold text-purple-400">136.6H</div>
+                <div id="stats-hours" class="text-2xl md:text-4xl font-orbitron font-bold text-purple-400">--</div>
                 <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="listedHours">列表累计时长</div>
             </div>
             <div class="cyber-card cyber-cut p-4 border border-amber-500/30 text-center relative overflow-hidden">
-                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">1H</div>
+                <div id="stats-window" class="text-2xl md:text-4xl font-orbitron font-bold text-amber-400">1M</div>
                 <div class="text-xs text-slate-400 font-mono tracking-wider mt-1" data-i18n="syncWindow">同步周期</div>
             </div>
         </div>
@@ -390,7 +394,7 @@
                     <p class="font-mono text-[11px] text-pink-400 tracking-[0.25em]" data-i18n="archiveEyebrow">ARCHIVE // 公开游戏活动</p>
                     <h2 class="font-orbitron text-2xl md:text-3xl font-black text-white mt-2" data-i18n="recentMissionsTitle">最近任务</h2>
                 </div>
-                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 小时自动同步。</p>
+                <p id="recent-source-label" class="max-w-xl text-xs font-mono text-slate-500 sm:text-right">由 Jasmin 手动更新；页面每分钟自动读取最新状态。</p>
             </div>
             <div id="recent-games-grid" class="grid md:grid-cols-2 gap-4" aria-live="polite"></div>
         </section>
@@ -454,7 +458,7 @@
             </p>
             <p class="mt-2 flex items-start justify-center gap-2 text-[9px] sm:text-[10px] font-mono leading-relaxed tracking-[0.05em] text-slate-700 hover:text-slate-500 transition-colors">
                 <i class="fa-solid fa-shield-halved mt-0.5 text-cyan-900" aria-hidden="true"></i>
-                <span data-i18n="privacyNotice">wish u good luck,wish u have a great day</span>
+                <span data-i18n="privacyNotice">Visitor analytics: this site automatically records IP address, country or region, and visit time for private statistics. Active records are removed after about 7 days.</span>
             </p>
         </div>
     </footer>
@@ -513,16 +517,15 @@
         }
         animateBg();
 
-        /* Steam profile feed
-           A public HTML file must never contain a Steam Web API key.
-           Put a safe JSON endpoint here when a server-side proxy is available.
-           Expected shape: { displayName, steamUrl, avatarUrl, status,
-           statusLabel, currentGame, recentGames, source, updatedAt } */
+        /* Manually maintained public status feed.
+           The admin password is handled by the server and is never exposed here.
+           Expected shape: { source: "manual", status, currentGame,
+           recentGames, recentGamesAvailable, updatedAt }. */
         const I18N = {
             zh: {
                 audioOff: '音效：关',
                 audioOn: '音效：开',
-                syncSteam: '同步 STEAM',
+                syncStatus: '刷新状态',
                 heroBadge: 'STEAM 特勤档案 // 公开资料',
                 heroTitle: '你好，这里是 JASMIN',
                 heroSubtitle: '< 欢迎进入我的赛博档案 // 玩家一号已就位 >',
@@ -533,10 +536,10 @@
                 recentMissionsButton: '最近任务',
                 activeMission: '当前任务',
                 realtimeSlot: '实时状态槽',
-                refreshCycle: '刷新周期：01:00:00',
-                steamStatus: 'STEAM 状态',
+                refreshCycle: '刷新周期：00:01:00',
+                presenceStatus: '我的状态',
                 publicSignals: '公开游戏信号',
-                listedHours: '列表累计时长',
+                listedHours: '已填写游戏时长',
                 syncWindow: '同步周期',
                 archiveEyebrow: 'ARCHIVE // 公开游戏活动',
                 recentMissionsTitle: '最近任务',
@@ -548,35 +551,37 @@
                 steamDescription: '进入我的 Steam 主页，查看公开游戏档案与最新在线信号。',
                 openSteamSocial: '打开 STEAM',
                 footerText: '信号持续在线。',
-                sourceLive: 'STEAM API // 实时',
-                sourceSnapshot: 'STEAM // 已验证快照',
+                sourceManual: '手动状态 // 最新',
+                sourceCache: '手动状态 // 已保存',
+                sourceFallback: '状态 // 等待更新',
                 online: '在线',
                 offline: '离线',
-                systemLive: 'STEAM 链路：实时 // 1 小时更新',
-                systemSnapshot: 'STEAM 链路：公开快照 // 已就绪',
-                recentLive: 'Steam 实时数据已连接；页面每 1 小时自动同步。',
-                recentSnapshot: '已验证的 Steam 公开资料快照。连接安全数据接口后，每 1 小时自动同步。',
+                systemManual: '状态链路：在线 // 每分钟更新',
+                systemCache: '状态链路：显示已保存数据 // 正在重试',
+                systemFallback: '状态链路：等待首次更新',
+                recentManual: '由 Jasmin 手动更新；页面每分钟自动读取最新状态。',
+                recentCache: '正在显示上次保存的手动状态；页面每分钟自动重试。',
+                recentFallback: '正在等待 Jasmin 发布第一条手动状态。',
                 noActiveGame: '当前未运行游戏',
                 offlineDetail: 'Jasmin 当前处于离线状态。',
                 onlineIdle: '在线待命，当前未进入游戏。',
-                nowPlayingHours: '正在游戏 // 累计 {hours} 小时',
-                nowPlayingActive: '正在游戏 // STEAM 信号活跃',
+                nowPlayingHours: '正在游戏 // 游戏时长：{hours}',
+                nowPlayingActive: '正在游戏 // 手动状态已更新',
                 noMissionData: '暂无公开游戏记录',
                 unknownMission: '未知任务',
                 mission: '任务',
-                publicActivity: '公开活动',
-                total: '累计',
-                lastSync: '上次同步',
-                toastSnapshot: '当前使用公开资料快照；接入安全数据接口后可每小时同步。',
-                toastSuccess: 'Steam 信号同步完成。',
-                toastFailure: 'Steam 信号暂时不可用，已保留上次状态。',
+                playtime: '游戏时长',
+                note: '备注',
+                lastSync: '状态更新',
+                toastSuccess: '最新手动状态已读取。',
+                toastFailure: '暂时无法获取最新状态，正在显示上次保存的数据。',
                 maintenanceNote: '该网站由 Jasmin 持续维护，更多内容敬请期待。',
-                privacyNotice: '祝你天天开心'
+                privacyNotice: '访问统计：本网站会自动记录 IP 地址、国家或地区和访问时间，仅用于私人统计；活动记录约 7 天后清理。'
             },
             en: {
                 audioOff: 'AUDIO: OFF',
                 audioOn: 'AUDIO: ON',
-                syncSteam: 'SYNC STEAM',
+                syncStatus: 'REFRESH STATUS',
                 heroBadge: 'STEAM OPERATIVE // PUBLIC PROFILE',
                 heroTitle: 'HELLO, THIS IS JASMIN',
                 heroSubtitle: '< WELCOME TO MY CYBER ARCHIVE // READY PLAYER ONE >',
@@ -587,10 +592,10 @@
                 recentMissionsButton: 'RECENT MISSIONS',
                 activeMission: 'ACTIVE MISSION',
                 realtimeSlot: 'REAL-TIME SLOT',
-                refreshCycle: 'REFRESH CYCLE: 01:00:00',
-                steamStatus: 'STEAM STATUS',
+                refreshCycle: 'REFRESH CYCLE: 00:01:00',
+                presenceStatus: 'MY STATUS',
                 publicSignals: 'PUBLIC GAME SIGNALS',
-                listedHours: 'LISTED TOTAL HOURS',
+                listedHours: 'LISTED GAME HOURS',
                 syncWindow: 'SYNC WINDOW',
                 archiveEyebrow: 'ARCHIVE // PUBLIC GAME ACTIVITY',
                 recentMissionsTitle: 'RECENT MISSIONS',
@@ -602,35 +607,37 @@
                 steamDescription: 'Enter my Steam profile to inspect the public game archive and latest online signal.',
                 openSteamSocial: 'OPEN STEAM',
                 footerText: 'SIGNAL REMAINS ONLINE.',
-                sourceLive: 'STEAM API // LIVE',
-                sourceSnapshot: 'STEAM // VERIFIED SNAPSHOT',
+                sourceManual: 'MANUAL STATUS // LATEST',
+                sourceCache: 'MANUAL STATUS // SAVED',
+                sourceFallback: 'STATUS // WAITING',
                 online: 'ONLINE',
                 offline: 'OFFLINE',
-                systemLive: 'STEAM UPLINK: LIVE // 1 HOUR UPDATE',
-                systemSnapshot: 'STEAM UPLINK: PUBLIC SNAPSHOT // READY',
-                recentLive: 'Live Steam data connected; this page syncs automatically every hour.',
-                recentSnapshot: 'Verified Steam public snapshot. Connect a secure data endpoint to sync every hour.',
+                systemManual: 'STATUS LINK: LIVE // 1 MINUTE UPDATE',
+                systemCache: 'STATUS LINK: SAVED DATA // RETRYING',
+                systemFallback: 'STATUS LINK: WAITING FOR FIRST UPDATE',
+                recentManual: 'Manually updated by Jasmin; this page checks for the latest status every minute.',
+                recentCache: 'Showing the last saved manual status; this page retries every minute.',
+                recentFallback: 'Waiting for Jasmin to publish the first manual status.',
                 noActiveGame: 'NO ACTIVE GAME',
                 offlineDetail: 'Jasmin is currently offline.',
                 onlineIdle: 'Online and standing by. No game is active.',
-                nowPlayingHours: 'NOW PLAYING // {hours} HOURS TOTAL',
-                nowPlayingActive: 'NOW PLAYING // STEAM SIGNAL ACTIVE',
+                nowPlayingHours: 'NOW PLAYING // GAME TIME: {hours}',
+                nowPlayingActive: 'NOW PLAYING // MANUAL STATUS UPDATED',
                 noMissionData: 'NO PUBLIC MISSION DATA',
                 unknownMission: 'UNKNOWN MISSION',
                 mission: 'MISSION',
-                publicActivity: 'PUBLIC ACTIVITY',
-                total: 'TOTAL',
-                lastSync: 'LAST SYNC',
-                toastSnapshot: 'Using the verified public snapshot. Connect a secure endpoint for hourly sync.',
-                toastSuccess: 'Steam signal synchronized.',
-                toastFailure: 'Steam signal unavailable. Keeping the last known status.',
+                playtime: 'GAME TIME',
+                note: 'NOTE',
+                lastSync: 'STATUS UPDATED',
+                toastSuccess: 'Latest manual status loaded.',
+                toastFailure: 'The latest status could not be loaded. Showing the last saved data.',
                 maintenanceNote: 'This website is continuously maintained by Jasmin. More content is coming soon.',
-                privacyNotice: 'wish u have a good day.'
+                privacyNotice: 'Visitor analytics: this site automatically records IP address, country or region, and visit time for private statistics. Active records are removed after about 7 days.'
             },
             ja: {
                 audioOff: 'サウンド：OFF',
                 audioOn: 'サウンド：ON',
-                syncSteam: 'STEAMを同期',
+                syncStatus: 'ステータスを更新',
                 heroBadge: 'STEAM オペレーター // 公開プロフィール',
                 heroTitle: 'HELLO、JASMINです',
                 heroSubtitle: '< サイバーアーカイブへようこそ // PLAYER ONE、準備完了 >',
@@ -641,10 +648,10 @@
                 recentMissionsButton: '最近のミッション',
                 activeMission: '進行中のミッション',
                 realtimeSlot: 'リアルタイム・スロット',
-                refreshCycle: '更新周期：01:00:00',
-                steamStatus: 'STEAMステータス',
+                refreshCycle: '更新周期：00:01:00',
+                presenceStatus: '現在のステータス',
                 publicSignals: '公開ゲームシグナル',
-                listedHours: '表示中の合計プレイ時間',
+                listedHours: '入力済みプレイ時間',
                 syncWindow: '同期周期',
                 archiveEyebrow: 'ARCHIVE // 公開ゲームアクティビティ',
                 recentMissionsTitle: '最近のミッション',
@@ -656,35 +663,37 @@
                 steamDescription: 'Steamプロフィールで、公開ゲームアーカイブと最新のオンラインシグナルを確認できます。',
                 openSteamSocial: 'STEAMを開く',
                 footerText: 'シグナルはオンラインを維持しています。',
-                sourceLive: 'STEAM API // LIVE',
-                sourceSnapshot: 'STEAM // 検証済みスナップショット',
+                sourceManual: '手動ステータス // 最新',
+                sourceCache: '手動ステータス // 保存済み',
+                sourceFallback: 'ステータス // 更新待ち',
                 online: 'オンライン',
                 offline: 'オフライン',
-                systemLive: 'STEAMアップリンク：LIVE // 1時間ごとに更新',
-                systemSnapshot: 'STEAMアップリンク：公開スナップショット // READY',
-                recentLive: 'Steamのリアルタイムデータに接続済み。ページは1時間ごとに自動同期されます。',
-                recentSnapshot: '検証済みのSteam公開スナップショットです。安全なデータエンドポイントに接続すると、1時間ごとに自動同期されます。',
+                systemManual: 'ステータス回線：LIVE // 1分ごとに更新',
+                systemCache: 'ステータス回線：保存データを表示 // 再試行中',
+                systemFallback: 'ステータス回線：最初の更新を待機中',
+                recentManual: 'Jasminが手動で更新。ページは1分ごとに最新ステータスを確認します。',
+                recentCache: '前回保存した手動ステータスを表示中。1分ごとに再試行します。',
+                recentFallback: 'Jasminによる最初の手動ステータス更新を待っています。',
                 noActiveGame: '現在プレイ中のゲームはありません',
                 offlineDetail: 'Jasminは現在オフラインです。',
                 onlineIdle: 'オンラインで待機中です。現在プレイ中のゲームはありません。',
-                nowPlayingHours: 'プレイ中 // 累計 {hours} 時間',
-                nowPlayingActive: 'プレイ中 // STEAMシグナル稼働中',
+                nowPlayingHours: 'プレイ中 // プレイ時間：{hours}',
+                nowPlayingActive: 'プレイ中 // 手動ステータス更新済み',
                 noMissionData: '公開ミッションデータはありません',
                 unknownMission: '不明なミッション',
                 mission: 'ミッション',
-                publicActivity: '公開アクティビティ',
-                total: '累計',
-                lastSync: '最終同期',
-                toastSnapshot: '検証済みの公開スナップショットを使用中です。安全なエンドポイントに接続すると、1時間ごとに同期できます。',
-                toastSuccess: 'Steamシグナルを同期しました。',
-                toastFailure: 'Steamシグナルを利用できません。最後に確認したステータスを保持します。',
+                playtime: 'プレイ時間',
+                note: 'メモ',
+                lastSync: 'ステータス更新',
+                toastSuccess: '最新の手動ステータスを読み込みました。',
+                toastFailure: '最新ステータスを取得できません。前回保存したデータを表示しています。',
                 maintenanceNote: 'このウェブサイトはJasminが継続的にメンテナンスしています。今後のコンテンツにもご期待ください。',
-                privacyNotice: 'よい いちにちを おすごしください'
+                privacyNotice: 'アクセス解析：このサイトはIPアドレス、国・地域、訪問時刻を個人用統計のため自動的に記録し、約7日後に削除します。'
             },
             de: {
                 audioOff: 'AUDIO: AUS',
                 audioOn: 'AUDIO: AN',
-                syncSteam: 'STEAM SYNCHRONISIEREN',
+                syncStatus: 'STATUS AKTUALISIEREN',
                 heroBadge: 'STEAM-EINSATZAKTE // ÖFFENTLICHES PROFIL',
                 heroTitle: 'HALLO, HIER IST JASMIN',
                 heroSubtitle: '< WILLKOMMEN IN MEINEM CYBER-ARCHIV // SPIELER EINS BEREIT >',
@@ -695,10 +704,10 @@
                 recentMissionsButton: 'LETZTE MISSIONEN',
                 activeMission: 'AKTIVE MISSION',
                 realtimeSlot: 'ECHTZEIT-SLOT',
-                refreshCycle: 'AKTUALISIERUNG: 01:00:00',
-                steamStatus: 'STEAM-STATUS',
+                refreshCycle: 'AKTUALISIERUNG: 00:01:00',
+                presenceStatus: 'MEIN STATUS',
                 publicSignals: 'ÖFFENTLICHE SPIELSIGNALE',
-                listedHours: 'AUFGELISTETE GESAMTSTUNDEN',
+                listedHours: 'EINGETRAGENE SPIELZEIT',
                 syncWindow: 'SYNC-INTERVALL',
                 archiveEyebrow: 'ARCHIV // ÖFFENTLICHE SPIELAKTIVITÄT',
                 recentMissionsTitle: 'LETZTE MISSIONEN',
@@ -710,30 +719,32 @@
                 steamDescription: 'Öffne mein Steam-Profil und entdecke mein öffentliches Spielearchiv sowie mein aktuelles Online-Signal.',
                 openSteamSocial: 'STEAM ÖFFNEN',
                 footerText: 'DAS SIGNAL BLEIBT ONLINE.',
-                sourceLive: 'STEAM API // LIVE',
-                sourceSnapshot: 'STEAM // VERIFIZIERTER SNAPSHOT',
+                sourceManual: 'MANUELLER STATUS // AKTUELL',
+                sourceCache: 'MANUELLER STATUS // GESPEICHERT',
+                sourceFallback: 'STATUS // WARTET',
                 online: 'ONLINE',
                 offline: 'OFFLINE',
-                systemLive: 'STEAM-UPLINK: LIVE // AKTUALISIERUNG JEDE STUNDE',
-                systemSnapshot: 'STEAM-UPLINK: ÖFFENTLICHER SNAPSHOT // BEREIT',
-                recentLive: 'Live-Steam-Daten verbunden; diese Seite synchronisiert sich automatisch jede Stunde.',
-                recentSnapshot: 'Verifizierter öffentlicher Steam-Snapshot. Verbinde einen sicheren Datenendpunkt für die stündliche Synchronisierung.',
+                systemManual: 'STATUS-VERBINDUNG: LIVE // AKTUALISIERUNG JEDE MINUTE',
+                systemCache: 'STATUS-VERBINDUNG: GESPEICHERTE DATEN // NEUER VERSUCH',
+                systemFallback: 'STATUS-VERBINDUNG: WARTET AUF ERSTES UPDATE',
+                recentManual: 'Manuell von Jasmin aktualisiert; diese Seite prüft den Status jede Minute.',
+                recentCache: 'Der zuletzt gespeicherte manuelle Status wird angezeigt; neuer Versuch jede Minute.',
+                recentFallback: 'Warten auf Jasmins erstes manuelles Status-Update.',
                 noActiveGame: 'KEIN AKTIVES SPIEL',
                 offlineDetail: 'Jasmin ist derzeit offline.',
                 onlineIdle: 'Online und in Bereitschaft. Derzeit ist kein Spiel aktiv.',
-                nowPlayingHours: 'WIRD GESPIELT // INSGESAMT {hours} STUNDEN',
-                nowPlayingActive: 'WIRD GESPIELT // STEAM-SIGNAL AKTIV',
+                nowPlayingHours: 'WIRD GESPIELT // SPIELZEIT: {hours}',
+                nowPlayingActive: 'WIRD GESPIELT // MANUELLER STATUS AKTUALISIERT',
                 noMissionData: 'KEINE ÖFFENTLICHEN MISSIONSDATEN',
                 unknownMission: 'UNBEKANNTE MISSION',
                 mission: 'MISSION',
-                publicActivity: 'ÖFFENTLICHE AKTIVITÄT',
-                total: 'GESAMT',
-                lastSync: 'LETZTE SYNCHRONISIERUNG',
-                toastSnapshot: 'Verifizierter öffentlicher Snapshot wird verwendet. Verbinde einen sicheren Endpunkt für die stündliche Synchronisierung.',
-                toastSuccess: 'Steam-Signal synchronisiert.',
-                toastFailure: 'Steam-Signal nicht verfügbar. Der letzte bekannte Status bleibt erhalten.',
+                playtime: 'SPIELZEIT',
+                note: 'NOTIZ',
+                lastSync: 'STATUS AKTUALISIERT',
+                toastSuccess: 'Aktueller manueller Status geladen.',
+                toastFailure: 'Der aktuelle Status konnte nicht geladen werden. Gespeicherte Daten werden angezeigt.',
                 maintenanceNote: 'Diese Website wird kontinuierlich von Jasmin gepflegt. Weitere Inhalte folgen bald.',
-                privacyNotice: 'Ich wünsche Ihnen einen schönen Tag'
+                privacyNotice: 'Besucherstatistik: Diese Website erfasst automatisch IP-Adresse, Land oder Region und Besuchszeit für private Statistiken; aktive Einträge werden nach etwa 7 Tagen gelöscht.'
             }
         };
 
@@ -745,33 +756,27 @@
         try { savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || ''; } catch (_) {}
         let currentLanguage = SUPPORTED_LANGUAGES.includes(savedLanguage) ? savedLanguage : 'en';
         let currentProfileData = null;
+        let currentProfileOrigin = 'fallback';
         const t = (key) => I18N[currentLanguage]?.[key] || I18N.en[key] || key;
 
         const CONFIG = {
             steamId: '76561199836731858',
             profileUrl: 'https://steamcommunity.com/profiles/76561199836731858/',
-            dataEndpoint: 'https://jasmin-game-archive.spicyeagle8.chatgpt.site/api/steam',
-            refreshMs: 60 * 60 * 1000,
-            cacheKey: 'jasmin_steam_profile_v7'
+            displayName: 'Jasmin',
+            avatarUrl: 'https://avatars.fastly.steamstatic.com/bfd442120857967ca312d18dbded4ad1566c8e12_full.jpg',
+            dataEndpoint: 'https://jasmin-game-archive.spicyeagle8.chatgpt.site/api/status',
+            refreshMs: 60 * 1000,
+            cacheKey: 'jasmin_manual_status_v1'
         };
 
-        const SNAPSHOT = {
-            source: 'steam-public-snapshot',
-            displayName: 'Jasmin',
-            steamUrl: CONFIG.profileUrl,
-            avatarUrl: 'https://avatars.fastly.steamstatic.com/bfd442120857967ca312d18dbded4ad1566c8e12_full.jpg',
+        const FALLBACK_STATUS = {
+            source: 'manual-fallback',
             status: 'offline',
             statusLabel: 'OFFLINE',
             currentGame: null,
-            updatedAt: '2026-10-09T09:00:00.000Z',
-            recentGames: [
-                { appId: 504230, name: 'Celeste', recentHours: 16.8, totalHours: 47 },
-                { appId: 942970, name: 'Unheard - Voices of Crime', recentHours: 7.7, totalHours: 8.6 },
-                { appId: 289070, name: "Sid Meier's Civilization VI", recentHours: 6.9, totalHours: 43 },
-                { appId: 400, name: 'Portal', recentHours: 3.3, totalHours: 3.3 },
-                { appId: 730, name: 'Counter-Strike 2', recentHours: 3.1, totalHours: 5.7 },
-                { appId: 1426210, name: 'It Takes Two', recentHours: 2.2, totalHours: 29 }
-            ]
+            recentGames: [],
+            recentGamesAvailable: false,
+            updatedAt: null
         };
 
         function setLanguage(language, rerender = true) {
@@ -796,7 +801,7 @@
             });
 
             document.getElementById('sfx-text').textContent = audioEnabled ? t('audioOn') : t('audioOff');
-            if (rerender && currentProfileData) renderProfile(currentProfileData);
+            if (rerender && currentProfileData) renderProfile(currentProfileData, currentProfileOrigin);
         }
 
         const gameImage = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${Number(appId)}/header.jpg`;
@@ -844,12 +849,16 @@
 
             games.slice(0, 6).forEach((game, index) => {
                 const appId = Number(game.appId || game.appid);
-                const card = document.createElement('a');
+                const hasAppId = Number.isInteger(appId) && appId > 0;
+                const storeUrl = safeUrl(game.storeUrl, hasAppId ? `https://store.steampowered.com/app/${appId}/` : '');
+                const card = document.createElement(storeUrl ? 'a' : 'article');
                 card.className = 'game-card cyber-card cyber-cut relative overflow-hidden border border-slate-700/70 p-5 flex flex-col justify-between hover:border-cyan-400 transition-colors';
-                card.href = Number.isFinite(appId) ? `https://store.steampowered.com/app/${appId}/` : CONFIG.profileUrl;
-                card.target = '_blank';
-                card.rel = 'noopener noreferrer';
-                const image = safeUrl(game.image, Number.isFinite(appId) ? gameImage(appId) : '');
+                if (storeUrl) {
+                    card.href = storeUrl;
+                    card.target = '_blank';
+                    card.rel = 'noopener noreferrer';
+                }
+                const image = safeUrl(game.image, hasAppId ? gameImage(appId) : '');
                 if (image) card.style.backgroundImage = `url("${image.replace(/"/g, '%22')}")`;
 
                 const top = document.createElement('div');
@@ -859,7 +868,7 @@
                 mission.textContent = `${t('mission')} ${String(index + 1).padStart(2, '0')}`;
                 const app = document.createElement('span');
                 app.className = 'font-mono text-[10px] text-slate-500';
-                app.textContent = Number.isFinite(appId) ? `APP // ${appId}` : 'APP // UNKNOWN';
+                app.textContent = hasAppId ? `APP // ${appId}` : 'MANUAL // ENTRY';
                 top.append(mission, app);
 
                 const info = document.createElement('div');
@@ -868,54 +877,96 @@
                 title.textContent = game.name || t('unknownMission');
                 const hours = document.createElement('p');
                 hours.className = 'font-mono text-xs text-slate-300 mt-3';
-                const activity = Number(game.recentHours);
-                const total = Number(game.totalHours);
-                const activityText = Number.isFinite(activity) ? `${t('publicActivity')} ${activity.toFixed(1)}H` : `${t('publicActivity')} --`;
-                const totalText = Number.isFinite(total) ? `${t('total')} ${total.toFixed(1)}H` : `${t('total')} --`;
-                hours.textContent = `${activityText} // ${totalText}`;
+                const hoursText = typeof game.hours === 'string' ? game.hours.trim() : '';
+                hours.textContent = `${t('playtime')} // ${hoursText || '--'}`;
                 info.append(title, hours);
+                const noteText = typeof game.note === 'string' ? game.note.trim() : '';
+                if (noteText) {
+                    const note = document.createElement('p');
+                    note.className = 'text-xs text-cyan-200/80 mt-2 whitespace-pre-line';
+                    note.textContent = `${t('note')} // ${noteText}`;
+                    info.appendChild(note);
+                }
                 card.append(top, info);
                 grid.appendChild(card);
             });
         }
 
-        function renderProfile(data) {
-            currentProfileData = data;
-            const games = Array.isArray(data.recentGames) ? data.recentGames : [];
-            const sourceIsLive = data.source === 'steam';
-            const status = String(data.status || 'offline').toLowerCase();
-            const statusLabel = status === 'offline' ? t('offline') : t('online');
-            const profileUrl = safeUrl(data.steamUrl, CONFIG.profileUrl);
-            const avatar = safeUrl(data.avatarUrl, SNAPSHOT.avatarUrl);
+        function numericHours(value) {
+            if (typeof value !== 'string') return null;
+            const match = value.replace(',', '.').match(/\d+(?:\.\d+)?/);
+            return match ? Number(match[0]) : null;
+        }
 
-            document.getElementById('profile-avatar').src = avatar;
-            document.getElementById('profile-name').textContent = data.displayName || 'Jasmin';
+        function renderProfile(data, origin = 'manual') {
+            currentProfileData = data;
+            currentProfileOrigin = origin;
+            const games = Array.isArray(data.recentGames) ? data.recentGames.filter((game) => game && typeof game === 'object') : [];
+            const status = String(data.status || 'offline').toLowerCase() === 'online' ? 'online' : 'offline';
+            const statusLabel = status === 'offline' ? t('offline') : t('online');
+            const sourceKey = origin === 'manual' ? 'sourceManual' : origin === 'cache' ? 'sourceCache' : 'sourceFallback';
+            const systemKey = origin === 'manual' ? 'systemManual' : origin === 'cache' ? 'systemCache' : 'systemFallback';
+            const recentKey = origin === 'manual' ? 'recentManual' : origin === 'cache' ? 'recentCache' : 'recentFallback';
+            const parsedHours = games.map((game) => numericHours(game.hours)).filter(Number.isFinite);
+
+            document.getElementById('profile-avatar').src = CONFIG.avatarUrl;
+            document.getElementById('profile-name').textContent = CONFIG.displayName;
             document.getElementById('profile-status').textContent = statusLabel;
-            document.getElementById('profile-source').textContent = sourceIsLive ? t('sourceLive') : t('sourceSnapshot');
-            document.getElementById('steam-profile-link').href = profileUrl;
+            document.getElementById('profile-source').textContent = t(sourceKey);
+            document.getElementById('steam-profile-link').href = CONFIG.profileUrl;
             document.getElementById('stats-status').textContent = statusLabel;
             document.getElementById('stats-games').textContent = String(games.length);
-            document.getElementById('stats-hours').textContent = `${games.reduce((sum, game) => sum + (Number(game.totalHours) || 0), 0).toFixed(1)}H`;
+            document.getElementById('stats-hours').textContent = parsedHours.length
+                ? `${parsedHours.reduce((sum, hours) => sum + hours, 0).toFixed(1)}H`
+                : '--';
             document.getElementById('last-sync').textContent = `${t('lastSync')}: ${formatSyncTime(data.updatedAt)}`;
-            document.getElementById('system-status').textContent = sourceIsLive
-                ? t('systemLive')
-                : t('systemSnapshot');
-            document.getElementById('recent-source-label').textContent = sourceIsLive
-                ? t('recentLive')
-                : t('recentSnapshot');
+            document.getElementById('system-status').textContent = t(systemKey);
+            document.getElementById('recent-source-label').textContent = t(recentKey);
 
             setStatusTone(status);
-            if (data.currentGame) {
-                document.getElementById('current-game-name').textContent = data.currentGame.name || t('activeMission');
-                const total = Number(data.currentGame.totalHours);
-                document.getElementById('current-game-detail').textContent = Number.isFinite(total)
-                    ? t('nowPlayingHours').replace('{hours}', total.toFixed(1))
+            const currentGame = data.currentGame && typeof data.currentGame === 'object' ? data.currentGame : null;
+            const currentGameLink = document.getElementById('current-game-link');
+            const currentGameLinkIcon = document.getElementById('current-game-link-icon');
+            const currentGameNote = document.getElementById('current-game-note');
+            if (currentGame) {
+                document.getElementById('current-game-name').textContent = currentGame.name || t('activeMission');
+                const currentAppId = Number(currentGame.appId);
+                const storeUrl = safeUrl(currentGame.storeUrl, Number.isInteger(currentAppId) && currentAppId > 0 ? `https://store.steampowered.com/app/${currentAppId}/` : '');
+                if (storeUrl) {
+                    currentGameLink.href = storeUrl;
+                    currentGameLink.target = '_blank';
+                    currentGameLink.rel = 'noopener noreferrer';
+                    currentGameLink.setAttribute('aria-disabled', 'false');
+                    currentGameLink.classList.add('hover:text-cyan-300');
+                    currentGameLinkIcon.classList.remove('hidden');
+                } else {
+                    currentGameLink.removeAttribute('href');
+                    currentGameLink.removeAttribute('target');
+                    currentGameLink.removeAttribute('rel');
+                    currentGameLink.setAttribute('aria-disabled', 'true');
+                    currentGameLink.classList.remove('hover:text-cyan-300');
+                    currentGameLinkIcon.classList.add('hidden');
+                }
+                const hoursText = typeof currentGame.hours === 'string' ? currentGame.hours.trim() : '';
+                document.getElementById('current-game-detail').textContent = hoursText
+                    ? t('nowPlayingHours').replace('{hours}', hoursText)
                     : t('nowPlayingActive');
+                const noteText = typeof currentGame.note === 'string' ? currentGame.note.trim() : '';
+                currentGameNote.textContent = noteText ? `${t('note')} // ${noteText}` : '';
+                currentGameNote.classList.toggle('hidden', !noteText);
             } else {
+                currentGameLink.removeAttribute('href');
+                currentGameLink.removeAttribute('target');
+                currentGameLink.removeAttribute('rel');
+                currentGameLink.setAttribute('aria-disabled', 'true');
+                currentGameLink.classList.remove('hover:text-cyan-300');
+                currentGameLinkIcon.classList.add('hidden');
                 document.getElementById('current-game-name').textContent = t('noActiveGame');
                 document.getElementById('current-game-detail').textContent = status === 'offline'
                     ? t('offlineDetail')
                     : t('onlineIdle');
+                currentGameNote.textContent = '';
+                currentGameNote.classList.add('hidden');
             }
             renderGameCards(games);
         }
@@ -924,7 +975,7 @@
             try {
                 const cached = JSON.parse(localStorage.getItem(CONFIG.cacheKey) || 'null');
                 if (!cached || !cached.savedAt || !cached.data) return null;
-                return Date.now() - cached.savedAt < CONFIG.refreshMs ? cached.data : null;
+                return cached.data;
             } catch (_) {
                 return null;
             }
@@ -950,36 +1001,33 @@
             toastTimer = setTimeout(() => toast.classList.remove('toast-visible'), 3200);
         }
 
-        async function refreshSteamProfile(force = false) {
-            const cached = !force && readCache();
-            if (cached) {
-                renderProfile(cached);
-                return;
-            }
-
-            if (!CONFIG.dataEndpoint) {
-                renderProfile(SNAPSHOT);
-                if (force) showToast(t('toastSnapshot'));
-                return;
-            }
-
+        async function refreshManualStatus(force = false) {
             setSyncing(true);
             try {
                 const endpoint = new URL(CONFIG.dataEndpoint);
-                endpoint.searchParams.set('refresh', String(Math.floor(Date.now() / CONFIG.refreshMs)));
+                endpoint.searchParams.set('refresh', String(Date.now()));
                 const response = await fetch(endpoint.toString(), {
                     cache: 'no-store',
                     headers: { Accept: 'application/json' }
                 });
-                if (!response.ok) throw new Error(`Steam feed ${response.status}`);
+                if (!response.ok) throw new Error(`Status feed ${response.status}`);
                 const data = await response.json();
-                if (!data || !Array.isArray(data.recentGames)) throw new Error('Invalid Steam payload');
-                saveCache(data);
-                renderProfile(data);
+                if (!data || typeof data !== 'object' || !Array.isArray(data.recentGames)) throw new Error('Invalid status payload');
+                const normalized = {
+                    ...FALLBACK_STATUS,
+                    ...data,
+                    source: 'manual',
+                    status: String(data.status).toLowerCase() === 'online' ? 'online' : 'offline',
+                    currentGame: data.currentGame && typeof data.currentGame === 'object' ? data.currentGame : null,
+                    recentGames: data.recentGames.filter((game) => game && typeof game === 'object')
+                };
+                saveCache(normalized);
+                renderProfile(normalized, 'manual');
                 if (force) showToast(t('toastSuccess'));
             } catch (error) {
-                console.warn('Steam sync unavailable; using verified snapshot.', error);
-                renderProfile(readCache() || SNAPSHOT);
+                const cached = readCache();
+                console.warn('Manual status update failed; keeping saved data.', error);
+                renderProfile(cached || FALLBACK_STATUS, cached ? 'cache' : 'fallback');
                 if (force) showToast(t('toastFailure'));
             } finally {
                 setSyncing(false);
@@ -1016,8 +1064,10 @@
         setLanguage(currentLanguage, false);
 
         window.addEventListener('load', () => {
-            refreshSteamProfile(false);
-            window.setInterval(() => refreshSteamProfile(false), CONFIG.refreshMs);
+            const cached = readCache();
+            renderProfile(cached || FALLBACK_STATUS, cached ? 'cache' : 'fallback');
+            refreshManualStatus(false);
+            window.setInterval(() => refreshManualStatus(false), CONFIG.refreshMs);
         });
     </script>
 
