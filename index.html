@@ -764,8 +764,10 @@
             profileUrl: 'https://steamcommunity.com/profiles/76561199836731858/',
             displayName: 'Jasmin',
             avatarUrl: 'https://avatars.fastly.steamstatic.com/bfd442120857967ca312d18dbded4ad1566c8e12_full.jpg',
-            dataEndpoint: 'https://jasmin-game-archive.spicyeagle8.chatgpt.site/api/status',
+            dataEndpoint: 'https://jasmin-manual-status.zhangjasmin56.workers.dev/api/status',
             refreshMs: 60 * 1000,
+            requestTimeoutMs: 10 * 1000,
+            cacheMaxAgeMs: 6 * 60 * 60 * 1000,
             cacheKey: 'jasmin_manual_status_v1'
         };
 
@@ -975,6 +977,10 @@
             try {
                 const cached = JSON.parse(localStorage.getItem(CONFIG.cacheKey) || 'null');
                 if (!cached || !cached.savedAt || !cached.data) return null;
+                if (Date.now() - cached.savedAt > CONFIG.cacheMaxAgeMs) {
+                    localStorage.removeItem(CONFIG.cacheKey);
+                    return null;
+                }
                 return cached.data;
             } catch (_) {
                 return null;
@@ -1003,11 +1009,14 @@
 
         async function refreshManualStatus(force = false) {
             setSyncing(true);
+            const controller = new AbortController();
+            const timeout = window.setTimeout(() => controller.abort(), CONFIG.requestTimeoutMs);
             try {
                 const endpoint = new URL(CONFIG.dataEndpoint);
                 endpoint.searchParams.set('refresh', String(Date.now()));
                 const response = await fetch(endpoint.toString(), {
                     cache: 'no-store',
+                    signal: controller.signal,
                     headers: { Accept: 'application/json' }
                 });
                 if (!response.ok) throw new Error(`Status feed ${response.status}`);
@@ -1030,6 +1039,7 @@
                 renderProfile(cached || FALLBACK_STATUS, cached ? 'cache' : 'fallback');
                 if (force) showToast(t('toastFailure'));
             } finally {
+                window.clearTimeout(timeout);
                 setSyncing(false);
             }
         }
@@ -1069,6 +1079,16 @@
             refreshManualStatus(false);
             window.setInterval(() => refreshManualStatus(false), CONFIG.refreshMs);
         });
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) refreshManualStatus(false);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshManualStatus(false);
+        });
+
+        window.addEventListener('online', () => refreshManualStatus(false));
     </script>
 
     <script>
