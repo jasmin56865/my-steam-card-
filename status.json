@@ -1,0 +1,26 @@
+{
+  "source": "manual",
+  "status": "online",
+  "statusLabel": "在线",
+  "currentGame": null,
+  "recentGames": [
+    {
+      "name": "celeste",
+      "storeUrl": "https://store.steampowered.com/app/504230/",
+      "hours": "49",
+      "note": "i have completed the 3b chapter!!!",
+      "appId": 504230,
+      "image": "https://cdn.akamai.steamstatic.com/steam/apps/504230/header.jpg"
+    },
+    {
+      "name": "Turing Complete",
+      "storeUrl": "https://store.steampowered.com/app/1444480/",
+      "hours": "8.7",
+      "note": "",
+      "appId": 1444480,
+      "image": "https://cdn.akamai.steamstatic.com/steam/apps/1444480/header.jpg"
+    }
+  ],
+  "recentGamesAvailable": true,
+  "updatedAt": "2026-10-14T17:01:52.032Z"
+}
